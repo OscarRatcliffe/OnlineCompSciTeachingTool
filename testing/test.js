@@ -1,20 +1,19 @@
 const Docker = require('dockerode');
-const { stdout } = require('process');
+const { exec } = require('child_process');
 const fs = require('fs');
+const { stdout } = require('process');
 const docker = new Docker();
 
 const pythonScript = fs.readFileSync('test.py', 'utf8');
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 docker.createContainer({
     Image: 'python',
     AttachStdout: true,
     AttachStderr: true,
     AttachStdin: true,
-    Tty: false,
+    Tty: true,
+    OpenStdin: true,
+    name: "PLEASECHANGEME",
     Cmd: ['python', '-c', pythonScript]
 }, function(err, container) {
 
@@ -30,21 +29,25 @@ docker.createContainer({
             return;
         }
 
-        const inputStream = process.stdin;
+        exec("echo test", (stdout) => {
 
-        container.logs({ follow: true, stdout: true, stderr: true }, function(err, stream) {
+            console.log(stdout)
+
+        })
+
+        container.wait(function(err) {
             if (err) {
-              console.error(err);
-              return;
+                console.error(err);
+                return;
             }
 
-            container.modem.demuxStream(stream, process.stdout, process.stderr);
+            container.remove(function(err) {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
             });
-
-          return sleep(1000).then(() => {
-            container.remove();
-          });
-
-          
+        });
     })
 });
+

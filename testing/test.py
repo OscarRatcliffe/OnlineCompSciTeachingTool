@@ -1,5 +1,7 @@
-print("Hello python")
+input()
 
-# value = input("Please enter an input: \n")
+print("Hello world")
 
-# print(f'Your input was {value}')
+print(input("Print this 1:\n"))
+
+print(input("Print this 2:\n"))
