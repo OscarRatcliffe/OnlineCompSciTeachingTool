@@ -1,7 +1,6 @@
 const Docker = require('dockerode');
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
 const fs = require('fs');
-const { stdout } = require('process');
 const docker = new Docker();
 
 const pythonScript = fs.readFileSync('test.py', 'utf8');
@@ -29,11 +28,10 @@ docker.createContainer({
             return;
         }
 
-        exec("echo test", (stdout) => {
-
-            console.log(stdout)
-
-        })
+        spawn('docker attach PLEASECHANGEME', {
+            stdio: 'inherit',
+            shell: true
+        });
 
         container.wait(function(err) {
             if (err) {
