@@ -1,0 +1,11 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Online computer science teaching tool",
+  "main": "build/main.js",
+  "scripts": {
+    "test": "tsc && cd build && node main.js && cd.."
+  },
+  "author": "Oscar Ratcliffe",
+  "license": "ISC"
+}

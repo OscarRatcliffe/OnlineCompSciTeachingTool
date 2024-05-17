@@ -1,9 +1,8 @@
 const Docker = require('dockerode');
 const { spawn } = require('child_process');
-const fs = require('fs');
 const docker = new Docker();
 
-const pythonScript = fs.readFileSync('test.py', 'utf8');
+function spawnContainer(code: string, containerID: number, currentContainerIDs: any) {
 
 docker.createContainer({
     Image: 'python',
@@ -12,39 +11,46 @@ docker.createContainer({
     AttachStdin: true,
     Tty: true,
     OpenStdin: true,
-    name: "PLEASECHANGEME",
-    Cmd: ['python', '-c', pythonScript]
-}, function(err, container) {
+    name: containerID,
+    Cmd: ['python', '-c', code]
+
+}, function(err: any, container: any) {
 
         if(err) {
             console.error(err)
             return;
         }
 
-    container.start(function(err, data) {1
+    container.start(function(err: any, data: any) {
 
         if(err) {
             console.error(err);
             return;
         }
 
-        spawn('docker attach PLEASECHANGEME', {
+        spawn(`docker attach ${containerID}`, {
             stdio: 'inherit',
             shell: true
         });
 
-        container.wait(function(err) {
+        container.wait(function(err: any ) {
             if (err) {
                 console.error(err);
                 return;
             }
 
-            container.remove(function(err) {
+            container.remove(function(err: any) {
                 if (err) {
                     console.error(err);
+
+                    currentContainerIDs = currentContainerIDs.filter((item: number )=> item !== containerID); //Remove ID from current running containers
+
                     return;
                 }
             });
         });
     })
 });
+}
+
+export default spawnContainer;
