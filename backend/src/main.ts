@@ -1,11 +1,24 @@
 const fs = require('fs');
 import spawnContainer from "./spawner";
+const express = require('express')
+const app = express()
 
 const pythonScript = fs.readFileSync('test.py', 'utf8');
 
 var currentContainerIDs: any = []
 
-var containerID:number = Math.floor(Math.random() * 1000000);
-currentContainerIDs.push(containerID)
+app.get('/', (req: any, res:any) => {
+    res.send({
+        "State": "Running container"
+    })
 
-spawnContainer(pythonScript, containerID, currentContainerIDs)
+    var containerID:number = Math.floor(Math.random() * 1000000);
+    currentContainerIDs.push(containerID)
+    
+    spawnContainer(pythonScript, containerID, currentContainerIDs)
+
+})
+
+app.listen(3000, () => {
+    console.log(`App running on port 3000`)
+  })

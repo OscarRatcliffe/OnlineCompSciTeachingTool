@@ -5,8 +5,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require('fs');
 const spawner_1 = __importDefault(require("./spawner"));
+const express = require('express');
+const app = express();
 const pythonScript = fs.readFileSync('test.py', 'utf8');
 var currentContainerIDs = [];
-var containerID = Math.floor(Math.random() * 1000000);
-currentContainerIDs.push(containerID);
-(0, spawner_1.default)(pythonScript, containerID, currentContainerIDs);
+app.get('/', (req, res) => {
+    res.send({
+        "State": "Running container"
+    });
+    var containerID = Math.floor(Math.random() * 1000000);
+    currentContainerIDs.push(containerID);
+    (0, spawner_1.default)(pythonScript, containerID, currentContainerIDs);
+});
+app.listen(3000, () => {
+    console.log(`App running on port 3000`);
+});
