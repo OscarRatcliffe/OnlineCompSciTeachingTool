@@ -1,21 +1,24 @@
-const http = require('http');
+const axios = require('axios');
+const readline = require('readline')
 
-const containerId = '197b14a4769560687b9baf56a684d24c2b72f76e4cf968ecfdf47694636316ac'; // Replace with your container ID
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
 
+const containerId = '8143';
 
-const req = http.request({
-    hostname: 'localhost',
-    port: 2375,
-    path: `/containers/${containerId}/attach?logs=1&stream=1&stdout=1&stderr=1`,
-    method: 'POST',
-}, (res) => {
+async function handleStream() {
+    
+    const res = await axios.post(`http://localhost:2375/containers/${containerId}/attach?logs=1&stream=1&stdout=1&stderr=1`,"Test", {
 
-console.log("Connected");
+        responseType: 'stream'
 
-    res.on('data', (chunk) => {
-        process.stdout.write(chunk);
     });
 
-});
+    console.log("Connected")
+    res.data.pipe(process.stdout);
 
-req.end();
+}
+
+handleStream();
