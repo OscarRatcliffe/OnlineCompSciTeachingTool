@@ -1,12 +1,6 @@
 const axios = require('axios');
-const readline = require('readline')
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-
-const containerId = '8143';
+const containerId = '8542';
 
 async function handleStream() {
     
@@ -16,8 +10,14 @@ async function handleStream() {
 
     });
 
+    
+    const stream = res.data
+
     console.log("Connected")
-    res.data.pipe(process.stdout);
+    
+    stream.on("data", data => {
+        console.log(data.toString())
+    })
 
 }
 
