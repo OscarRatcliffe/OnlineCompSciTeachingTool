@@ -24,32 +24,27 @@ docker.createContainer({
 
     container.start(function(err: any, data: any) {
 
-    //     if(err) {
-    //         console.error(err);
-    //         return;
-    //     }
+        if(err) {
+            console.error(err);
+            return;
+        }
 
-    //     spawn(`docker attach ${containerID}`, {
-    //         stdio: 'inherit',
-    //         shell: true
-    //     });
+        container.wait(function(err: any ) {
+            if (err) {
+                console.error(err);
+                return;
+            }
 
-    //     container.wait(function(err: any ) {
-    //         if (err) {
-    //             console.error(err);
-    //             return;
-    //         }
+            container.remove(function(err: any) {
+                if (err) {
+                    console.error(err);
 
-    //         container.remove(function(err: any) {
-    //             if (err) {
-    //                 console.error(err);
+                    currentContainerIDs = currentContainerIDs.filter((item: number )=> item !== containerID); //Remove ID from current running containers
 
-    //                 currentContainerIDs = currentContainerIDs.filter((item: number )=> item !== containerID); //Remove ID from current running containers
-
-    //                 return;
-    //             }
-    //         });
-//         });
+                    return;
+                }
+            });
+        });
     })
 });
 }

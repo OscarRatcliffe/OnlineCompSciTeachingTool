@@ -10,11 +10,11 @@ const app = express();
 const pythonScript = fs.readFileSync('test.py', 'utf8');
 var currentContainerIDs = [];
 app.get('/', (req, res) => {
-    res.send({
-        "State": "Running container"
-    });
     var containerID = Math.floor(Math.random() * 999) + 8000;
     currentContainerIDs.push(containerID);
+    res.send({
+        "State": `Created container ${containerID}`
+    });
     (0, spawner_1.default)(pythonScript, containerID, currentContainerIDs);
 });
 app.listen(3000, () => {

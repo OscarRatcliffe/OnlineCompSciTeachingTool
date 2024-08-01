@@ -8,12 +8,13 @@ const pythonScript = fs.readFileSync('test.py', 'utf8');
 var currentContainerIDs: any = []
 
 app.get('/', (req: any, res:any) => {
-    res.send({
-        "State": "Running container"
-    })
 
     var containerID:number = Math.floor(Math.random() * 999) + 8000;
     currentContainerIDs.push(containerID)
+
+    res.send({
+        "State": `Created container ${containerID}`
+    })
     
     spawnContainer(pythonScript, containerID, currentContainerIDs)
 
