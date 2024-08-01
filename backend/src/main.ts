@@ -12,7 +12,7 @@ app.get('/', (req: any, res:any) => {
         "State": "Running container"
     })
 
-    var containerID:number = Math.floor(Math.random() * 1000000);
+    var containerID:number = Math.floor(Math.random() * 999) + 8000;
     currentContainerIDs.push(containerID)
     
     spawnContainer(pythonScript, containerID, currentContainerIDs)

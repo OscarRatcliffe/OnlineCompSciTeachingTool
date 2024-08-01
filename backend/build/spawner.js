@@ -9,6 +9,7 @@ function spawnContainer(code, containerID, currentContainerIDs) {
         AttachStdout: true,
         AttachStderr: true,
         AttachStdin: true,
+        AttachStream: true,
         Tty: true,
         OpenStdin: true,
         name: containerID,
@@ -19,27 +20,27 @@ function spawnContainer(code, containerID, currentContainerIDs) {
             return;
         }
         container.start(function (err, data) {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            spawn(`docker attach ${containerID}`, {
-                stdio: 'inherit',
-                shell: true
-            });
-            container.wait(function (err) {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-                container.remove(function (err) {
-                    if (err) {
-                        console.error(err);
-                        currentContainerIDs = currentContainerIDs.filter((item) => item !== containerID); //Remove ID from current running containers
-                        return;
-                    }
-                });
-            });
+            //     if(err) {
+            //         console.error(err);
+            //         return;
+            //     }
+            //     spawn(`docker attach ${containerID}`, {
+            //         stdio: 'inherit',
+            //         shell: true
+            //     });
+            //     container.wait(function(err: any ) {
+            //         if (err) {
+            //             console.error(err);
+            //             return;
+            //         }
+            //         container.remove(function(err: any) {
+            //             if (err) {
+            //                 console.error(err);
+            //                 currentContainerIDs = currentContainerIDs.filter((item: number )=> item !== containerID); //Remove ID from current running containers
+            //                 return;
+            //             }
+            //         });
+            //         });
         });
     });
 }
