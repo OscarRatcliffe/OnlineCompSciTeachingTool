@@ -12,25 +12,24 @@ const client = new Client({
     port: 5432,
     database: "postgres"
 })
+await client.connect()
 
 // Test Func
-async function authCheck(username:string, password:string, type:userGroup): Promise<number | null> { //HTTP code for login | Broken func
+async function authCheck(username:string, password:string, type:userGroup): Promise<number | undefined> { //HTTP code for login
 
-    await client.connect()
+    let HTTPCode = 500
 
     const passwordRes = await client.query(`SELECT password FROM ${type.toLowerCase()} WHERE username='${username}'`) //Get password and its salt fields for given username
-
-    console.log(passwordRes)
 
     // Custom error handling
     if (typeof(passwordRes.rowCount) == null) {
 
         throw error("ERROR: SQL Response malformed") // Used in testing
-        return 500 //Internal Server Error - Used in production
+        HTTPCode = 500 //Internal Server Error - Used in production
 
     } else if (passwordRes.rowCount == 0) {
 
-        return 404 //Not found, username not in DB
+        HTTPCode = 404 //Not found, username not in DB
 
     } else if (passwordRes.rowCount !> 1) {
 
@@ -42,23 +41,25 @@ async function authCheck(username:string, password:string, type:userGroup): Prom
         const hashedPassword = passwordRes.rows[0].password 
 
         //Check password using bcrypt
-        bcrypt.compare(password, hashedPassword.then((res: any) => {
+        await bcrypt.compare(password, hashedPassword).then((res: any) => { //Await so that the check can be done without a premature exit
 
             if (res) {
 
-                return 200 //Ok, password correct
+                HTTPCode = 200 //Ok, password correct
+
 
             } else {
 
-                return 401 //Unauthorized, password incorrect
+                HTTPCode = 401 //Unauthorized, password incorrect
 
             }
 
-        }))
+            
+        })
     }
 
-    await client.end()
-    return null
+    return HTTPCode 
+
 }
 
-export default authCheck;
+export {authCheck};
