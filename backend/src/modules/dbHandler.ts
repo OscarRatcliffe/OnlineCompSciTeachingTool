@@ -16,16 +16,17 @@ const client = new Client({
 await client.connect()
 
 // Test Func
-async function authCheck(username:string, password:string): Promise<[number, userGroup]> { //HTTP code for login
+async function authCheck(username:string, password:string): Promise<[number, userGroup, Array<number>]> { //HTTP code , Access Level, Class
 
     let HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR
+    let classes: Array<number> = []
 
-    let passwordRes = await client.query(`SELECT password FROM students WHERE username='${username}'`) //Get password field for student
+    let passwordRes = await client.query(`SELECT password, class FROM students WHERE username='${username}'`) //Get password field for student
     let userType: userGroup = "Student"
 
     if (passwordRes.rowCount == 0) { //If cant find student check teachers
 
-        passwordRes = await client.query(`SELECT password FROM teacher WHERE username='${username}'`) //Get password field for teacher
+        passwordRes = await client.query(`SELECT password, ID FROM teacher WHERE username='${username}'`) //Get password field for teacher
         userType = "Teacher"
 
     }
@@ -50,11 +51,29 @@ async function authCheck(username:string, password:string): Promise<[number, use
         const hashedPassword = passwordRes.rows[0].password 
 
         //Check password using bcrypt
-        await bcrypt.compare(password, hashedPassword).then((res: any) => { //Await so that the check can be done without a premature exit
+        await bcrypt.compare(password, hashedPassword).then (async(res: any) => { //Await so that the check can be done without a premature exit
 
             if (res) {
 
                 HTTPCode = StatusCodes.OK //Password correct
+
+                // Calculate classes (Done after check to save processing time)
+                if (userType == "Student") {
+
+                    classes = [passwordRes.rows[0].class] //Student to classes is many to one so place in an array for consistent function return
+
+                } else {
+
+                    // Look at class table to create a list of classes the teacher teaches
+                    const classesres = await client.query(`SELECT id FROM class WHERE teacher='${passwordRes.rows[0].id}'`)
+                    
+                    for (let i = 0; i > classesres.rows.length; i++) {  //Iterate through returned rows
+
+                        classes.push(classesres.rows[i].id)
+
+                    }
+
+                }
 
 
             } else {
@@ -67,7 +86,7 @@ async function authCheck(username:string, password:string): Promise<[number, use
         })
     }
 
-    return [HTTPCode, userType]
+    return [HTTPCode, userType, classes]
 
 }
 

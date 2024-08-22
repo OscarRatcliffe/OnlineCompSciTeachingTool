@@ -42,12 +42,13 @@ app.get('/testCreation', async (req: any, res:any) => { //Async function allows 
 app.get('/login', async (req:any, res:any) => {
 
     //Get post request data
-    const postData = res.body;
+    // const postData = res.body;
 
     const authCheckRes = await authCheck("testteacher", "teacher") //Check if username and password is correct
 
-    const auth = authCheckRes[0]
-    const userType: userGroup = authCheckRes[1]
+    const auth:number = authCheckRes[0]
+    const AccessLevel: userGroup = authCheckRes[1]
+    const classes: Array<number> = authCheckRes[2] //Only 1 value for students, multiple for teachers
 
     // Only return information if username and password is correct
     if (auth == 200) {
@@ -55,7 +56,8 @@ app.get('/login', async (req:any, res:any) => {
         res.status(200) //Set HTTP code
 
         res.send({
-            "UserType": userType,
+            "AccessLevel": AccessLevel,
+            "Classes": classes,
             "Data": 123
         })
 

@@ -2,6 +2,7 @@
 import pg from 'pg';
 import bcrypt from 'bcryptjs';
 import { error } from 'console';
+import { StatusCodes } from 'http-status-codes';
 // Connect to DB
 const { Client } = pg;
 const client = new Client({
@@ -13,16 +14,22 @@ const client = new Client({
 });
 await client.connect();
 // Test Func
-async function authCheck(username, password, type) {
-    let HTTPCode = 500;
-    const passwordRes = await client.query(`SELECT password FROM ${type.toLowerCase()} WHERE username='${username}'`); //Get password and its salt fields for given username
+async function authCheck(username, password) {
+    let HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR;
+    let classes = [];
+    let passwordRes = await client.query(`SELECT password, class FROM students WHERE username='${username}'`); //Get password field for student
+    let userType = "Student";
+    if (passwordRes.rowCount == 0) { //If cant find student check teachers
+        passwordRes = await client.query(`SELECT password, ID FROM teacher WHERE username='${username}'`); //Get password field for teacher
+        userType = "Teacher";
+    }
     // Custom error handling
     if (typeof (passwordRes.rowCount) == null) {
         throw error("ERROR: SQL Response malformed"); // Used in testing
-        HTTPCode = 500; //Internal Server Error - Used in production
+        HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR; //Used in production
     }
     else if (passwordRes.rowCount == 0) {
-        HTTPCode = 404; //Not found, username not in DB
+        HTTPCode = StatusCodes.NOT_FOUND; //Username not in DB
     }
     else if (passwordRes.rowCount > 1) {
         throw error("ERROR Username duplicate - Check Sign Up method");
@@ -31,15 +38,26 @@ async function authCheck(username, password, type) {
         // Hash entered password and check against DB
         const hashedPassword = passwordRes.rows[0].password;
         //Check password using bcrypt
-        await bcrypt.compare(password, hashedPassword).then((res) => {
+        await bcrypt.compare(password, hashedPassword).then(async (res) => {
             if (res) {
-                HTTPCode = 200; //Ok, password correct
+                HTTPCode = StatusCodes.OK; //Password correct
+                // Calculate classes (Done after check to save processing time)
+                if (userType == "Student") {
+                    classes = [passwordRes.rows[0].class]; //Student to classes is many to one so place in an array for consistent function return
+                }
+                else {
+                    // Look at class table to create a list of classes the teacher teaches
+                    const classesres = await client.query(`SELECT id FROM class WHERE teacher='${passwordRes.rows[0].id}'`);
+                    for (let i = 0; i > classesres.rows.length; i++) { //Iterate through returned rows
+                        classes.push(classesres.rows[i].id);
+                    }
+                }
             }
             else {
-                HTTPCode = 401; //Unauthorized, password incorrect
+                HTTPCode = StatusCodes.UNAUTHORIZED; //Password incorrect
             }
         });
     }
-    return HTTPCode;
+    return [HTTPCode, userType, classes];
 }
 export { authCheck };

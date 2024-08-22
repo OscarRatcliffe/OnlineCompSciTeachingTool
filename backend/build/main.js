@@ -4,6 +4,7 @@ import express from 'express';
 const app = express();
 // Custom libraries
 import { authCheck } from "./modules/dbHandler.js";
+import spawnContainer from "./modules/spawner.js";
 // Get test script
 const pythonScript = fs.readFileSync('test.py', 'utf8');
 // Create containers
@@ -22,17 +23,22 @@ app.get('/testCreation', async (req, res) => {
     res.send({
         "State": `Created container ${containerID}`
     });
-    // spawnContainer(pythonScript, containerID, currentContainerIDs)
+    spawnContainer(pythonScript, containerID, currentContainerIDs);
 });
 //Login script
 app.get('/login', async (req, res) => {
-    // //Get post request data
+    //Get post request data
     // const postData = res.body;
-    const auth = await authCheck("testteacher", "teacher", "Teacher"); //Check if username and password is correct
+    const authCheckRes = await authCheck("testteacher", "teacher"); //Check if username and password is correct
+    const auth = authCheckRes[0];
+    const AccessLevel = authCheckRes[1];
+    const classes = authCheckRes[2]; //Only 1 value for students, multiple for teachers
     // Only return information if username and password is correct
     if (auth == 200) {
         res.status(200); //Set HTTP code
         res.send({
+            "AccessLevel": AccessLevel,
+            "Classes": classes,
             "Data": 123
         });
     }
