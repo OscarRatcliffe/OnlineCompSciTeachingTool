@@ -1,5 +1,6 @@
 // Librarys
 import pg from 'pg'
+import cryptoRandomString from 'crypto-random-string';
 import bcrypt from 'bcryptjs'
 import { error } from 'console'
 import { StatusCodes } from 'http-status-codes'
@@ -15,13 +16,118 @@ const client = new Client({
 })
 await client.connect()
 
-// Test Func
+// Check user ID and generate a session ID
+async function login(username:string, password:string): Promise<[number, string]> { //HTTPCode, Session ID
+
+    let HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR;
+    let sessionID = "";
+
+    let passwordRes = await client.query(`SELECT password, class FROM student WHERE username='${username}'`) //Get password field for student
+    let userType: userGroup = "Student"
+
+    if (passwordRes.rowCount == 0) { //If cant find student check teachers
+
+        passwordRes = await client.query(`SELECT password, ID FROM teacher WHERE username='${username}'`) //Get password field for teacher
+        userType = "Teacher"
+
+    }
+
+    // Custom error handling
+    if (typeof(passwordRes.rowCount) == null) {
+
+        throw error("ERROR: SQL Response malformed") // Used in testing
+        HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR //Used in production
+
+    } else if (passwordRes.rowCount == 0) {
+
+        HTTPCode = StatusCodes.NOT_FOUND //Username not in DB
+
+    } else if (passwordRes.rowCount !> 1) {
+
+        throw error("ERROR Username duplicate - Check Sign Up method")
+        
+    } else {
+
+        // Hash entered password and check against DB
+        const hashedPassword = passwordRes.rows[0].password 
+
+        //Check password using bcrypt
+        await bcrypt.compare(password, hashedPassword).then (async(res: any) => { //Await so that the check can be done without a premature exit
+
+            if (res) {
+
+                HTTPCode = StatusCodes.OK //Password correct
+
+                // Generate a unique session ID
+                let uniqueCode: boolean = false;
+
+                while(!uniqueCode) {
+                    let pass = true;
+
+                    sessionID = cryptoRandomString({length: 32, type: 'url-safe'}); //Generate a token
+
+                    let studentSessionRes = await client.query("SELECT last_session_id FROM student") //Check if token is already in use
+                    let teacherSessionRes = await client.query("SELECT last_session_id FROM teacher") //Check if token is already in use
+
+                    //Check if used for student
+                    for (let i = 0; i < studentSessionRes.rows.length; i++) {
+                        
+                        if(sessionID == studentSessionRes.rows[i].last_session_id) {
+
+                            pass = false
+
+                        }
+
+                    }
+
+                    //Check if used for teacher
+                    for (let i = 0; i < teacherSessionRes.rows.length; i++) {
+                        
+                        if(sessionID == teacherSessionRes.rows[i].last_session_id) {
+
+                            pass = false
+
+                        }
+
+                    }
+
+                    if (pass) { // Check if item was a duplicate
+
+                        uniqueCode = true
+
+                    }
+
+                }
+                // Update value in DB with expiry date a week from now
+
+                const epochTime = new Date().getTime();
+                const days = Math.floor(epochTime / 86400000) //Convert from ms since 1970 to days
+
+                const nextWeekDays = days + 7; 
+
+                await client.query(`UPDATE ${userType.toLowerCase()} SET last_session_id = '${sessionID}', session_expires = '${nextWeekDays}' WHERE username='${username}'`)
+
+            } else {
+
+                HTTPCode = StatusCodes.UNAUTHORIZED //Password incorrect
+
+            }
+
+            
+        })
+    }
+
+    return [HTTPCode, sessionID]
+
+}
+
+// Check user permissions
 async function authCheck(username:string, password:string): Promise<[number, userGroup, Array<number>]> { //HTTP code , Access Level, Class
 
     let HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR
     let classes: Array<number> = []
 
-    let passwordRes = await client.query(`SELECT password, class FROM students WHERE username='${username}'`) //Get password field for student
+    let passwordRes = await client.query(`SELECT password, class FROM student WHERE username='${username}'`) //Get password field for student
     let userType: userGroup = "Student"
 
     if (passwordRes.rowCount == 0) { //If cant find student check teachers
@@ -90,4 +196,4 @@ async function authCheck(username:string, password:string): Promise<[number, use
 
 }
 
-export {authCheck};
+export {authCheck, login};

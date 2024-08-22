@@ -4,7 +4,7 @@ import express from 'express'
 const app = express()
 
 // Custom libraries
-import { authCheck } from "./modules/dbHandler.js";
+import { authCheck, login } from "./modules/dbHandler.js";
 import spawnContainer from "./modules/spawner.js";
 
 
@@ -15,57 +15,72 @@ const pythonScript = fs.readFileSync('test.py', 'utf8');
 var currentContainerIDs: any = []
 app.get('/testCreation', async (req: any, res:any) => { //Async function allows for multiple containers to be created at once
 
-    let createdValidID = false
-    let containerID: number = 0 
+    try {
 
-    while (!createdValidID) { //Loop until unique ID is created
-
-        containerID = Math.floor(Math.random() * 999) + 8000;
-
-        if (!currentContainerIDs.includes(containerID)) {
-            createdValidID = true
-            currentContainerIDs.push(containerID)
-        }
-    }
-
-    console.log(containerID)
-
-    res.send({
-        "State": `Created container ${containerID}`
-    })
+        let createdValidID = false
+        let containerID: number = 0 
     
-    spawnContainer(pythonScript, containerID, currentContainerIDs)
+        while (!createdValidID) { //Loop until unique ID is created
+    
+            containerID = Math.floor(Math.random() * 999) + 8000;
+    
+            if (!currentContainerIDs.includes(containerID)) {
+                createdValidID = true
+                currentContainerIDs.push(containerID)
+            }
+        }
+    
+        console.log(containerID)
+    
+        res.send({
+            "State": `Created container ${containerID}`
+        })
+        
+        spawnContainer(pythonScript, containerID, currentContainerIDs)
 
+    } catch {
+
+        res.sendStatus(500)
+
+    }
 })
 
 //Login script
-app.get('/login', async (req:any, res:any) => {
+app.post('/login', async (req:any, res:any) => {
 
     // Get post request data
-    const postData: loginFormat = res.body;
+    const postData:loginFormat = {
+        "Username": req.query.Username,
+        "Password": req.query.Password
+    }
 
-    const authCheckRes = await authCheck(postData.Username, postData.Password) //Check if username and password is correct
+    try {
 
-    const auth:number = authCheckRes[0]
-    const AccessLevel: userGroup = authCheckRes[1]
-    const classes: Array<number> = authCheckRes[2] //Only 1 value for students, multiple for teachers
+        const loginCheckRes = await login(postData.Username, postData.Password) //Check if username and password is correct
 
-    // Only return information if username and password is correct
-    if (auth == 200) {
+        const auth:number = loginCheckRes[0]
+        const sessionID: string = loginCheckRes[1]
 
-        res.status(200) //Set HTTP code
+        // Only return information if username and password is correct
+        if (auth == 200) {
 
-        res.send({
-            "AccessLevel": AccessLevel,
-            "Classes": classes,
-            "Data": 123
-        })
+            res.status(200) //Set HTTP code
 
-    } else {
+            res.send(sessionID) 
 
-        res.sendStatus(auth)
+        } else {
+
+            res.sendStatus(auth)
+
+        }
+
+    } catch {
+
+        res.sendStatus(500)
 
     }
+
+
 })
 
 // Start webserver
