@@ -67,7 +67,7 @@ async function authCheck(username:string, password:string): Promise<[number, use
                     // Look at class table to create a list of classes the teacher teaches
                     const classesres = await client.query(`SELECT id FROM class WHERE teacher='${passwordRes.rows[0].id}'`)
                     
-                    for (let i = 0; i > classesres.rows.length; i++) {  //Iterate through returned rows
+                    for (let i = 0; i < classesres.rows.length; i++) {  //Iterate through returned rows
 
                         classes.push(classesres.rows[i].id)
 
