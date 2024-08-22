@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const containerId = '8542';
+const containerId = '8425';
 
 async function handleStream() {
     
@@ -14,6 +14,8 @@ async function handleStream() {
     const stream = res.data
 
     console.log("Connected")
+
+    stream.write("Test data");
     
     stream.on("data", data => {
         console.log(data.toString())
