@@ -2,6 +2,7 @@
 import pg from 'pg'
 import bcrypt from 'bcryptjs'
 import { error } from 'console'
+import { StatusCodes } from 'http-status-codes'
 
 // Connect to DB
 const { Client } = pg
@@ -15,21 +16,29 @@ const client = new Client({
 await client.connect()
 
 // Test Func
-async function authCheck(username:string, password:string, type:userGroup): Promise<number | undefined> { //HTTP code for login
+async function authCheck(username:string, password:string): Promise<[number, userGroup]> { //HTTP code for login
 
-    let HTTPCode = 500
+    let HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR
 
-    const passwordRes = await client.query(`SELECT password FROM ${type.toLowerCase()} WHERE username='${username}'`) //Get password and its salt fields for given username
+    let passwordRes = await client.query(`SELECT password FROM students WHERE username='${username}'`) //Get password field for student
+    let userType: userGroup = "Student"
+
+    if (passwordRes.rowCount == 0) { //If cant find student check teachers
+
+        passwordRes = await client.query(`SELECT password FROM teacher WHERE username='${username}'`) //Get password field for teacher
+        userType = "Teacher"
+
+    }
 
     // Custom error handling
     if (typeof(passwordRes.rowCount) == null) {
 
         throw error("ERROR: SQL Response malformed") // Used in testing
-        HTTPCode = 500 //Internal Server Error - Used in production
+        HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR //Used in production
 
     } else if (passwordRes.rowCount == 0) {
 
-        HTTPCode = 404 //Not found, username not in DB
+        HTTPCode = StatusCodes.NOT_FOUND //Username not in DB
 
     } else if (passwordRes.rowCount !> 1) {
 
@@ -45,12 +54,12 @@ async function authCheck(username:string, password:string, type:userGroup): Prom
 
             if (res) {
 
-                HTTPCode = 200 //Ok, password correct
+                HTTPCode = StatusCodes.OK //Password correct
 
 
             } else {
 
-                HTTPCode = 401 //Unauthorized, password incorrect
+                HTTPCode = StatusCodes.UNAUTHORIZED //Password incorrect
 
             }
 
@@ -58,7 +67,7 @@ async function authCheck(username:string, password:string, type:userGroup): Prom
         })
     }
 
-    return HTTPCode 
+    return [HTTPCode, userType]
 
 }
 

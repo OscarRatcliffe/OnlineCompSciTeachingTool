@@ -41,10 +41,13 @@ app.get('/testCreation', async (req: any, res:any) => { //Async function allows 
 //Login script
 app.get('/login', async (req:any, res:any) => {
 
-    // //Get post request data
-    // const postData = res.body;
+    //Get post request data
+    const postData = res.body;
 
-    const auth = await authCheck("testteacher", "teacher", "Teacher") //Check if username and password is correct
+    const authCheckRes = await authCheck("testteacher", "teacher") //Check if username and password is correct
+
+    const auth = authCheckRes[0]
+    const userType: userGroup = authCheckRes[1]
 
     // Only return information if username and password is correct
     if (auth == 200) {
@@ -52,6 +55,7 @@ app.get('/login', async (req:any, res:any) => {
         res.status(200) //Set HTTP code
 
         res.send({
+            "UserType": userType,
             "Data": 123
         })
 
