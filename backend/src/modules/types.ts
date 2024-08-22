@@ -1,0 +1,1 @@
+type userGroup = ["Student", "Teacher"]
