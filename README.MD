@@ -9,11 +9,14 @@
 - Interactive terminal
 - Solution marking
 
+- Pass login info in body not URL
+
 # Write up structure
 - DB container
 - DB tables / references
 - TS Create custom types / setup
 - Connecting DB to TS
 - TS create API endpoint
-- Auth check function
+- Login / sessionID function
+- Auth check func
 - Create spawner module
