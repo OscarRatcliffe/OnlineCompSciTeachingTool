@@ -4,18 +4,31 @@ import express from 'express'
 const app = express()
 
 // Custom libraries
-import getStudents from "./modules/dbHandler.js";
+import { authCheck } from "./modules/dbHandler.js";
 import spawnContainer from "./modules/spawner.js";
+
 
 // Get test script
 const pythonScript = fs.readFileSync('test.py', 'utf8');
 
 // Create containers
 var currentContainerIDs: any = []
-app.get('/testCreation', (req: any, res:any) => {
+app.get('/testCreation', async (req: any, res:any) => { //Async function allows for multiple containers to be created at once
 
-    var containerID:number = Math.floor(Math.random() * 999) + 8000;
-    currentContainerIDs.push(containerID)
+    let createdValidID = false
+    let containerID: number = 0 
+
+    while (!createdValidID) { //Loop until unique ID is created
+
+        containerID = Math.floor(Math.random() * 999) + 8000;
+
+        if (!currentContainerIDs.includes(containerID)) {
+            createdValidID = true
+            currentContainerIDs.push(containerID)
+        }
+    }
+
+    console.log(containerID)
 
     res.send({
         "State": `Created container ${containerID}`
@@ -26,10 +39,27 @@ app.get('/testCreation', (req: any, res:any) => {
 })
 
 //Login script
-app.get('/login', (req:any, res:any) => {
+app.get('/login', async (req:any, res:any) => {
 
-    console.log(getStudents())
+    // //Get post request data
+    // const postData = res.body;
 
+    const auth = await authCheck("testteacher", "teacher", "Teacher") //Check if username and password is correct
+
+    // Only return information if username and password is correct
+    if (auth == 200) {
+
+        res.status(200) //Set HTTP code
+
+        res.send({
+            "Data": 123
+        })
+
+    } else {
+
+        res.sendStatus(auth)
+
+    }
 })
 
 // Start webserver
