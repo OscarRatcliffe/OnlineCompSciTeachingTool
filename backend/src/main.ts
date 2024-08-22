@@ -15,34 +15,39 @@ const pythonScript = fs.readFileSync('test.py', 'utf8');
 var currentContainerIDs: any = []
 app.get('/testCreation', async (req: any, res:any) => { //Async function allows for multiple containers to be created at once
 
-    try {
+    if(authCheck(req.query.session) != null) {
 
-        let createdValidID = false
-        let containerID: number = 0 
-    
-        while (!createdValidID) { //Loop until unique ID is created
-    
-            containerID = Math.floor(Math.random() * 999) + 8000;
-    
-            if (!currentContainerIDs.includes(containerID)) {
-                createdValidID = true
-                currentContainerIDs.push(containerID)
-            }
-        }
-    
-        console.log(containerID)
-    
-        res.send({
-            "State": `Created container ${containerID}`
-        })
+        try {
+
+            let createdValidID = false
+            let containerID: number = 0 
         
-        spawnContainer(pythonScript, containerID, currentContainerIDs)
-
-    } catch {
-
-        res.sendStatus(500)
+            while (!createdValidID) { //Loop until unique ID is created
+        
+                containerID = Math.floor(Math.random() * 999) + 8000;
+        
+                if (!currentContainerIDs.includes(containerID)) {
+                    createdValidID = true
+                    currentContainerIDs.push(containerID)
+                }
+            }
+        
+            console.log(containerID)
+        
+            res.send({
+                "State": `Created container ${containerID}`
+            })
+            
+            spawnContainer(pythonScript, containerID, currentContainerIDs)
+    
+        } catch {
+    
+            res.sendStatus(500)
+    
+        }
 
     }
+
 })
 
 //Login script

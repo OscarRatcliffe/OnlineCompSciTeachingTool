@@ -122,77 +122,64 @@ async function login(username:string, password:string): Promise<[number, string]
 }
 
 // Check user permissions
-async function authCheck(username:string, password:string): Promise<[number, userGroup, Array<number>]> { //HTTP code , Access Level, Class
+async function authCheck(sessionID:string): Promise<[userGroup, Array<number>] | null> { //Access Level, Class / Token not valid
 
-    let HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR
     let classes: Array<number> = []
 
-    let passwordRes = await client.query(`SELECT password, class FROM student WHERE username='${username}'`) //Get password field for student
+    let sessionRes = await client.query(`SELECT class, sesssion_expires FROM student WHERE last_session_id='${sessionID}'`) //Get password field for student
     let userType: userGroup = "Student"
 
-    if (passwordRes.rowCount == 0) { //If cant find student check teachers
+    if (sessionRes.rowCount == 0) { //If cant find student check teachers
 
-        passwordRes = await client.query(`SELECT password, ID FROM teacher WHERE username='${username}'`) //Get password field for teacher
+        sessionRes = await client.query(`SELECT ID, sesssion_expires FROM teacher WHERE last_session_id='${sessionID}'`) //Get password field for teacher
         userType = "Teacher"
 
     }
 
     // Custom error handling
-    if (typeof(passwordRes.rowCount) == null) {
+    if (typeof(sessionRes.rowCount) == null) {
 
-        throw error("ERROR: SQL Response malformed") // Used in testing
-        HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR //Used in production
+        throw error("SQL Response malformed") // Used in testing
 
-    } else if (passwordRes.rowCount == 0) {
+    } else if (sessionRes.rowCount == 0) {
 
-        HTTPCode = StatusCodes.NOT_FOUND //Username not in DB
+        return null
 
-    } else if (passwordRes.rowCount !> 1) {
+    } else if (sessionRes.rowCount !> 1) {
 
-        throw error("ERROR Username duplicate - Check Sign Up method")
+        throw error("Session token duplicate - Check Login method")
         
     } else {
 
-        // Hash entered password and check against DB
-        const hashedPassword = passwordRes.rows[0].password 
+        //Check if token is still valid
+        const epochTime = new Date().getTime();
+        const days = Math.floor(epochTime / 86400000)
 
-        //Check password using bcrypt
-        await bcrypt.compare(password, hashedPassword).then (async(res: any) => { //Await so that the check can be done without a premature exit
+        if (sessionRes.rows[0].session_expires > days) {
+            return null
+        }
 
-            if (res) {
+        // Calculate classes
+        if (userType == "Student") {
 
-                HTTPCode = StatusCodes.OK //Password correct
+            classes = [sessionRes.rows[0].class] //Student to classes is many to one so place in an array for consistent function return
 
-                // Calculate classes (Done after check to save processing time)
-                if (userType == "Student") {
+        } else {
 
-                    classes = [passwordRes.rows[0].class] //Student to classes is many to one so place in an array for consistent function return
+            // Look at class table to create a list of classes the teacher teaches
+            const classesres = await client.query(`SELECT id FROM class WHERE teacher='${sessionRes.rows[0].id}'`)
+            
+            for (let i = 0; i < classesres.rows.length; i++) {  //Iterate through returned rows
 
-                } else {
-
-                    // Look at class table to create a list of classes the teacher teaches
-                    const classesres = await client.query(`SELECT id FROM class WHERE teacher='${passwordRes.rows[0].id}'`)
-                    
-                    for (let i = 0; i < classesres.rows.length; i++) {  //Iterate through returned rows
-
-                        classes.push(classesres.rows[i].id)
-
-                    }
-
-                }
-
-
-            } else {
-
-                HTTPCode = StatusCodes.UNAUTHORIZED //Password incorrect
+                classes.push(classesres.rows[i].id)
 
             }
 
-            
-        })
+        }
+
     }
 
-    return [HTTPCode, userType, classes]
+    return [userType, classes]
 
 }
 
