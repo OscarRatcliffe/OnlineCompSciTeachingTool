@@ -41,10 +41,10 @@ app.get('/testCreation', async (req: any, res:any) => { //Async function allows 
 //Login script
 app.get('/login', async (req:any, res:any) => {
 
-    //Get post request data
-    // const postData = res.body;
+    // Get post request data
+    const postData: loginFormat = res.body;
 
-    const authCheckRes = await authCheck("testteacher", "teacher") //Check if username and password is correct
+    const authCheckRes = await authCheck(postData.Username, postData.Password) //Check if username and password is correct
 
     const auth:number = authCheckRes[0]
     const AccessLevel: userGroup = authCheckRes[1]

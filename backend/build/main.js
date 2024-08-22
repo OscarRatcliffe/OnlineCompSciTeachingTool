@@ -27,9 +27,9 @@ app.get('/testCreation', async (req, res) => {
 });
 //Login script
 app.get('/login', async (req, res) => {
-    //Get post request data
-    // const postData = res.body;
-    const authCheckRes = await authCheck("testteacher", "teacher"); //Check if username and password is correct
+    // Get post request data
+    const postData = res.body;
+    const authCheckRes = await authCheck(postData.Username, postData.Password); //Check if username and password is correct
     const auth = authCheckRes[0];
     const AccessLevel = authCheckRes[1];
     const classes = authCheckRes[2]; //Only 1 value for students, multiple for teachers
