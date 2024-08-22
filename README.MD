@@ -19,4 +19,5 @@
 - TS create API endpoint
 - Login / sessionID function
 - Auth check func
+- Docker compose setup
 - Create spawner module
