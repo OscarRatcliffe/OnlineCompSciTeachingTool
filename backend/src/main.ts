@@ -1,12 +1,15 @@
 // Librarys
 import fs from 'fs';
 import express from 'express'
+import cors from 'cors';
 const app = express()
 
 // Custom libraries
 import { authCheck, login } from "./modules/dbHandler.js";
 import spawnContainer from "./modules/spawner.js";
 
+// CORS Options
+app.use(cors());
 
 // Get test script
 const pythonScript = fs.readFileSync('test.py', 'utf8');
@@ -59,9 +62,11 @@ app.post('/login', async (req:any, res:any) => {
 
     // Get post request data
     const postData:loginFormat = {
-        "Username": req.query.Username,
-        "Password": req.query.Password
+        "Username": req.body.Username,
+        "Password": req.body.Password
     }
+
+    console.log(`Login request for ${postData.Username}`)
 
     try {
 

@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <div className={styles.main}>
 
-      <h1>Example test</h1>
+      <h1>Dashboard</h1>
 
     </div>
   );

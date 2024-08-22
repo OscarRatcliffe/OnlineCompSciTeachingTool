@@ -1,7 +1,7 @@
 import "./globals.scss";
 
 export const metadata: Metadata = {
-  title: "CompSciTeachingTool",
+  title: "Knick Knack",
   description: "Created by Oscar Ratcliffe",
 };
 
