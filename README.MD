@@ -21,3 +21,9 @@
 - Auth check func
 - Docker compose setup
 - Create spawner module
+
+# Prototype stages
+- Teacher login, create class, create students
+- Teacher create task
+- Student work on / run task
+- Task submission / review
