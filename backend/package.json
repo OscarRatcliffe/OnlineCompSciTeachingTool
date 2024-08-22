@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Online computer science teaching tool",
   "main": "build/main.js",
+  "type": "module",
   "scripts": {
     "test": "tsc && cd build && node main.js && cd.."
   },
@@ -10,5 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/dockerode": "^3.3.31",
+    "@types/express": "^4.17.21"
   }
 }

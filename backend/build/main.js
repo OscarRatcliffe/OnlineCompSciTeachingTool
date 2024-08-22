@@ -1,22 +1,27 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const fs = require('fs');
-const spawner_1 = __importDefault(require("./spawner"));
-const express = require('express');
+// Librarys
+import fs from 'fs';
+import express from 'express';
 const app = express();
+// Custom libraries
+import getStudents from "./modules/dbHandler.js";
+import spawnContainer from "./modules/spawner.js";
+// Get test script
 const pythonScript = fs.readFileSync('test.py', 'utf8');
+// Create containers
 var currentContainerIDs = [];
-app.get('/', (req, res) => {
+app.get('/testCreation', (req, res) => {
     var containerID = Math.floor(Math.random() * 999) + 8000;
     currentContainerIDs.push(containerID);
     res.send({
         "State": `Created container ${containerID}`
     });
-    (0, spawner_1.default)(pythonScript, containerID, currentContainerIDs);
+    spawnContainer(pythonScript, containerID, currentContainerIDs);
 });
+//Login script
+app.get('/login', (req, res) => {
+    console.log(getStudents());
+});
+// Start webserver
 app.listen(3000, () => {
     console.log(`App running on port 3000`);
 });

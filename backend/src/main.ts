@@ -1,13 +1,18 @@
-const fs = require('fs');
-import spawnContainer from "./spawner";
-const express = require('express')
+// Librarys
+import fs from 'fs';
+import express from 'express'
 const app = express()
 
+// Custom libraries
+import getStudents from "./modules/dbHandler.js";
+import spawnContainer from "./modules/spawner.js";
+
+// Get test script
 const pythonScript = fs.readFileSync('test.py', 'utf8');
 
+// Create containers
 var currentContainerIDs: any = []
-
-app.get('/', (req: any, res:any) => {
+app.get('/testCreation', (req: any, res:any) => {
 
     var containerID:number = Math.floor(Math.random() * 999) + 8000;
     currentContainerIDs.push(containerID)
@@ -20,6 +25,14 @@ app.get('/', (req: any, res:any) => {
 
 })
 
+//Login script
+app.get('/login', (req:any, res:any) => {
+
+    console.log(getStudents())
+
+})
+
+// Start webserver
 app.listen(3000, () => {
     console.log(`App running on port 3000`)
   })
