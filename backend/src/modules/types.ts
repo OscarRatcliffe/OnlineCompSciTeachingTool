@@ -1,1 +1,0 @@
-type userGroup = ["Student", "Teacher"]
