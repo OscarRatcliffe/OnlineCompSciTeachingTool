@@ -9,7 +9,7 @@ const { Client } = pg;
 const client = new Client({
     user: "postgres",
     password: "postgres",
-    host: "localhost",
+    host: "db",
     port: 5432,
     database: "postgres"
 });
@@ -30,7 +30,7 @@ async function login(username, password) {
         HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR; //Used in production
     }
     else if (passwordRes.rowCount == 0) {
-        HTTPCode = StatusCodes.NOT_FOUND; //Username not in DB
+        HTTPCode = StatusCodes.UNAUTHORIZED; //Username not in DB - Not relayed to user for security
     }
     else if (passwordRes.rowCount > 1) {
         throw error("ERROR Username duplicate - Check Sign Up method");
@@ -48,7 +48,7 @@ async function login(username, password) {
                     let pass = true;
                     sessionID = cryptoRandomString({ length: 32, type: 'url-safe' }); //Generate a token
                     let studentSessionRes = await client.query("SELECT last_session_id FROM student"); //Check if token is already in use
-                    let teacherSessionRes = await client.query("SELECT last_session_id FROM teacher"); //Check if token is already in use
+                    let teacherSessionRes = await client.query("SELECT last_session_id FROM teacher");
                     //Check if used for student
                     for (let i = 0; i < studentSessionRes.rows.length; i++) {
                         if (sessionID == studentSessionRes.rows[i].last_session_id) {
@@ -69,7 +69,7 @@ async function login(username, password) {
                 const epochTime = new Date().getTime();
                 const days = Math.floor(epochTime / 86400000); //Convert from ms since 1970 to days
                 const nextWeekDays = days + 7;
-                await client.query(`UPDATE ${userType.toLowerCase()} SET last_session_id = '${sessionID}', session_expires = '${nextWeekDays}' WHERE username='${username}'`);
+                await client.query(`UPDATE ${userType.toLowerCase()} SET last_session_id = '${sessionID}', session_expires = '${nextWeekDays}' WHERE username='${username}'`); //Only 1 session ID does limit device amount but not an issue due to only being used on school computers
             }
             else {
                 HTTPCode = StatusCodes.UNAUTHORIZED; //Password incorrect
@@ -79,50 +79,47 @@ async function login(username, password) {
     return [HTTPCode, sessionID];
 }
 // Check user permissions
-async function authCheck(username, password) {
-    let HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR;
+async function authCheck(sessionID) {
     let classes = [];
-    let passwordRes = await client.query(`SELECT password, class FROM student WHERE username='${username}'`); //Get password field for student
+    let validAuth = true;
+    let sessionRes = await client.query(`SELECT class, session_expires FROM student WHERE last_session_id='${sessionID}'`); //Get password field for student
     let userType = "Student";
-    if (passwordRes.rowCount == 0) { //If cant find student check teachers
-        passwordRes = await client.query(`SELECT password, ID FROM teacher WHERE username='${username}'`); //Get password field for teacher
+    if (sessionRes.rowCount == 0) { //If cant find student check teachers
+        sessionRes = await client.query(`SELECT ID, session_expires FROM teacher WHERE last_session_id='${sessionID}'`); //Get password field for teacher
         userType = "Teacher";
     }
     // Custom error handling
-    if (typeof (passwordRes.rowCount) == null) {
-        throw error("ERROR: SQL Response malformed"); // Used in testing
-        HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR; //Used in production
+    if (typeof (sessionRes.rowCount) == null) {
+        throw error("SQL Response malformed"); // Used in testing
     }
-    else if (passwordRes.rowCount == 0) {
-        HTTPCode = StatusCodes.NOT_FOUND; //Username not in DB
+    else if (sessionRes.rowCount == 0) {
+        validAuth = false;
     }
-    else if (passwordRes.rowCount > 1) {
-        throw error("ERROR Username duplicate - Check Sign Up method");
+    else if (sessionRes.rowCount > 1) {
+        throw error("Session token duplicate - Check Login method");
     }
     else {
-        // Hash entered password and check against DB
-        const hashedPassword = passwordRes.rows[0].password;
-        //Check password using bcrypt
-        await bcrypt.compare(password, hashedPassword).then(async (res) => {
-            if (res) {
-                HTTPCode = StatusCodes.OK; //Password correct
-                // Calculate classes (Done after check to save processing time)
-                if (userType == "Student") {
-                    classes = [passwordRes.rows[0].class]; //Student to classes is many to one so place in an array for consistent function return
-                }
-                else {
-                    // Look at class table to create a list of classes the teacher teaches
-                    const classesres = await client.query(`SELECT id FROM class WHERE teacher='${passwordRes.rows[0].id}'`);
-                    for (let i = 0; i < classesres.rows.length; i++) { //Iterate through returned rows
-                        classes.push(classesres.rows[i].id);
-                    }
-                }
+        //Check if token is still valid
+        const epochTime = new Date().getTime();
+        const days = Math.floor(epochTime / 86400000);
+        if (sessionRes.rows[0].session_expires < days) {
+            validAuth = false;
+        }
+        // Calculate classes
+        if (userType == "Student") {
+            classes = [sessionRes.rows[0].class]; //Student to classes is many to one so place in an array for consistent function return
+        }
+        else {
+            // Look at class table to create a list of classes the teacher teaches
+            const classesres = await client.query(`SELECT id FROM class WHERE teacher='${sessionRes.rows[0].id}'`);
+            for (let i = 0; i < classesres.rows.length; i++) { //Iterate through returned rows
+                classes.push(classesres.rows[i].id);
             }
-            else {
-                HTTPCode = StatusCodes.UNAUTHORIZED; //Password incorrect
-            }
-        });
+        }
     }
-    return [HTTPCode, userType, classes];
+    if (validAuth) {
+        return [userType, classes];
+    }
+    return null;
 }
 export { authCheck, login };

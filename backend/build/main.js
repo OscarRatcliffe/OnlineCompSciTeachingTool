@@ -3,31 +3,36 @@ import fs from 'fs';
 import express from 'express';
 const app = express();
 // Custom libraries
-import { login } from "./modules/dbHandler.js";
+import { authCheck, login } from "./modules/dbHandler.js";
 import spawnContainer from "./modules/spawner.js";
 // Get test script
 const pythonScript = fs.readFileSync('test.py', 'utf8');
 // Create containers
 var currentContainerIDs = [];
 app.get('/testCreation', async (req, res) => {
-    try {
-        let createdValidID = false;
-        let containerID = 0;
-        while (!createdValidID) { //Loop until unique ID is created
-            containerID = Math.floor(Math.random() * 999) + 8000;
-            if (!currentContainerIDs.includes(containerID)) {
-                createdValidID = true;
-                currentContainerIDs.push(containerID);
+    if (await authCheck(req.query.session) != null) {
+        try {
+            let createdValidID = false;
+            let containerID = 0;
+            while (!createdValidID) { //Loop until unique ID is created
+                containerID = Math.floor(Math.random() * 999) + 8000;
+                if (!currentContainerIDs.includes(containerID)) {
+                    createdValidID = true;
+                    currentContainerIDs.push(containerID);
+                }
             }
+            console.log(containerID);
+            res.send({
+                "State": `Created container ${containerID}`
+            });
+            spawnContainer(pythonScript, containerID, currentContainerIDs);
         }
-        console.log(containerID);
-        res.send({
-            "State": `Created container ${containerID}`
-        });
-        spawnContainer(pythonScript, containerID, currentContainerIDs);
+        catch {
+            res.sendStatus(500);
+        }
     }
-    catch {
-        res.sendStatus(500);
+    else {
+        res.sendStatus(403);
     }
 });
 //Login script

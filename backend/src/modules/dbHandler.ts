@@ -10,7 +10,7 @@ const { Client } = pg
 const client = new Client({
     user: "postgres",
     password: "postgres",
-    host: "localhost",
+    host: "db",
     port: 5432,
     database: "postgres"
 })
@@ -40,7 +40,7 @@ async function login(username:string, password:string): Promise<[number, string]
 
     } else if (passwordRes.rowCount == 0) {
 
-        HTTPCode = StatusCodes.NOT_FOUND //Username not in DB
+        HTTPCode = StatusCodes.UNAUTHORIZED //Username not in DB - Not relayed to user for security
 
     } else if (passwordRes.rowCount !> 1) {
 
@@ -67,7 +67,7 @@ async function login(username:string, password:string): Promise<[number, string]
                     sessionID = cryptoRandomString({length: 32, type: 'url-safe'}); //Generate a token
 
                     let studentSessionRes = await client.query("SELECT last_session_id FROM student") //Check if token is already in use
-                    let teacherSessionRes = await client.query("SELECT last_session_id FROM teacher") //Check if token is already in use
+                    let teacherSessionRes = await client.query("SELECT last_session_id FROM teacher") 
 
                     //Check if used for student
                     for (let i = 0; i < studentSessionRes.rows.length; i++) {
@@ -105,7 +105,7 @@ async function login(username:string, password:string): Promise<[number, string]
 
                 const nextWeekDays = days + 7; 
 
-                await client.query(`UPDATE ${userType.toLowerCase()} SET last_session_id = '${sessionID}', session_expires = '${nextWeekDays}' WHERE username='${username}'`)
+                await client.query(`UPDATE ${userType.toLowerCase()} SET last_session_id = '${sessionID}', session_expires = '${nextWeekDays}' WHERE username='${username}'`) //Only 1 session ID does limit device amount but not an issue due to only being used on school computers
 
             } else {
 
@@ -125,13 +125,14 @@ async function login(username:string, password:string): Promise<[number, string]
 async function authCheck(sessionID:string): Promise<[userGroup, Array<number>] | null> { //Access Level, Class / Token not valid
 
     let classes: Array<number> = []
+    let validAuth:boolean = true;
 
-    let sessionRes = await client.query(`SELECT class, sesssion_expires FROM student WHERE last_session_id='${sessionID}'`) //Get password field for student
+    let sessionRes = await client.query(`SELECT class, session_expires FROM student WHERE last_session_id='${sessionID}'`) //Get password field for student
     let userType: userGroup = "Student"
 
     if (sessionRes.rowCount == 0) { //If cant find student check teachers
 
-        sessionRes = await client.query(`SELECT ID, sesssion_expires FROM teacher WHERE last_session_id='${sessionID}'`) //Get password field for teacher
+        sessionRes = await client.query(`SELECT ID, session_expires FROM teacher WHERE last_session_id='${sessionID}'`) //Get password field for teacher
         userType = "Teacher"
 
     }
@@ -143,7 +144,7 @@ async function authCheck(sessionID:string): Promise<[userGroup, Array<number>] |
 
     } else if (sessionRes.rowCount == 0) {
 
-        return null
+        validAuth = false
 
     } else if (sessionRes.rowCount !> 1) {
 
@@ -155,8 +156,8 @@ async function authCheck(sessionID:string): Promise<[userGroup, Array<number>] |
         const epochTime = new Date().getTime();
         const days = Math.floor(epochTime / 86400000)
 
-        if (sessionRes.rows[0].session_expires > days) {
-            return null
+        if (sessionRes.rows[0].session_expires < days) {
+            validAuth = false
         }
 
         // Calculate classes
@@ -179,7 +180,15 @@ async function authCheck(sessionID:string): Promise<[userGroup, Array<number>] |
 
     }
 
-    return [userType, classes]
+    if (validAuth) {
+
+        return [userType, classes]
+
+    }
+    
+    return null
+
+    
 
 }
 

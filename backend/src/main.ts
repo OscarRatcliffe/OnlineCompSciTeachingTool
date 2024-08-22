@@ -13,9 +13,9 @@ const pythonScript = fs.readFileSync('test.py', 'utf8');
 
 // Create containers
 var currentContainerIDs: any = []
-app.get('/testCreation', async (req: any, res:any) => { //Async function allows for multiple containers to be created at once
+app.get('/testCreation', async (req: any, res:any) => { 
 
-    if(authCheck(req.query.session) != null) {
+    if(await authCheck(req.query.session) != null) {
 
         try {
 
@@ -45,6 +45,10 @@ app.get('/testCreation', async (req: any, res:any) => { //Async function allows 
             res.sendStatus(500)
     
         }
+
+    } else {
+
+        res.sendStatus(403)
 
     }
 

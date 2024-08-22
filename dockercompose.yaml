@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./database/Data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: dockerfile
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 3000:3000
+
+networks:
+  dbNetwork:
+    driver: bridge
