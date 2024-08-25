@@ -1,14 +1,17 @@
 // Librarys
 import fs from 'fs';
 import express from 'express'
+import bodyParser from 'body-parser';
+
 import cors from 'cors';
+import { log } from 'console';
 const app = express()
 
 // Custom libraries
 import { authCheck, login } from "./modules/dbHandler.js";
 import spawnContainer from "./modules/spawner.js";
 
-// CORS Options
+//CORS
 app.use(cors());
 
 // Get test script
@@ -58,19 +61,19 @@ app.get('/testCreation', async (req: any, res:any) => {
 })
 
 //Login script
-app.post('/login', async (req:any, res:any) => {
-
+app.get('/login', async (req:any, res:any) => {
+ 
     // Get post request data
     const postData:loginFormat = {
-        "Username": req.body.Username,
-        "Password": req.body.Password
+        "Username": req.headers.username,
+        "Password": req.headers.password
     }
 
-    console.log(`Login request for ${postData.Username}`)
+    console.log(postData.Username, postData.Password)
 
     try {
 
-        const loginCheckRes = await login(postData.Username, postData.Password) //Check if username and password is correct
+        const loginCheckRes = await login(postData.Username.toLowerCase(), postData.Password) //Check if username and password is correct
 
         const auth:number = loginCheckRes[0]
         const sessionID: string = loginCheckRes[1]

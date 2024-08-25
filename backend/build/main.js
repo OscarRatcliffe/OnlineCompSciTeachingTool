@@ -6,7 +6,7 @@ const app = express();
 // Custom libraries
 import { authCheck, login } from "./modules/dbHandler.js";
 import spawnContainer from "./modules/spawner.js";
-// CORS Options
+//CORS
 app.use(cors());
 // Get test script
 const pythonScript = fs.readFileSync('test.py', 'utf8');
@@ -39,15 +39,15 @@ app.get('/testCreation', async (req, res) => {
     }
 });
 //Login script
-app.post('/login', async (req, res) => {
+app.get('/login', async (req, res) => {
     // Get post request data
     const postData = {
-        "Username": req.body.Username,
-        "Password": req.body.Password
+        "Username": req.headers.username,
+        "Password": req.headers.password
     };
-    console.log(`Login request for ${postData.Username}`);
+    console.log(postData.Username, postData.Password);
     try {
-        const loginCheckRes = await login(postData.Username, postData.Password); //Check if username and password is correct
+        const loginCheckRes = await login(postData.Username.toLowerCase(), postData.Password); //Check if username and password is correct
         const auth = loginCheckRes[0];
         const sessionID = loginCheckRes[1];
         // Only return information if username and password is correct
