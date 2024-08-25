@@ -6,5 +6,10 @@
 
 @font-face {
 	font-family: 'gothambold';
-	src: local('gothambold'), url('./gothambold.woff') format('woff');
+	src: local('gothambold'), url('./fonts/gothambold.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'aptosLight';
+	src: local('aptosLight'), url('./fonts/aptos-light.woff') format('woff');
 }

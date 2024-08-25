@@ -5,53 +5,71 @@
   background-color: #1f1e25;
   font-family: "gothambold";
   color: white;
-}
 
-.login {
-  margin: 0;
-  text-align: center;
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  
-  .LoginText{
-    padding-bottom: 1rem;
+  ErrorMsg{
+
+    opacity: 1;
+
   }
 
-  .button {
-    color: #97979a;
-    border: 0;
-  }
-
-  .button:hover {
-    color: #c3c3c5;
-  }
-
-  .button:active {
-    color: white;
-  }
-
-  input {
+  .login {
     width: 25em;
-    height: 3em;
-    margin: 0.4em;
-
-    background: 0;
-
-    border-top: 0em;
-    border-left: 0em;
-    border-right: 0em;
-
-    border-color: #2c313c;
-
-    outline: 0;
-
-    font-family: "gothambold";
-    color: white;
-
+    margin: 0;
     text-align: center;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    
+    .LoginText{
+      padding-bottom: 1rem;
+    }
+  
+    .button {
+      color: #97979a;
+      border: 0;
+    }
+  
+    .button:hover {
+      color: #c3c3c5;
+    }
+  
+    .button:active {
+      color: white;
+    }
+  
+    input {
+      width: 25em;
+      height: 3em;
+      margin: 0.4em;
+  
+      background: 0;
+  
+      border-top: 0em;
+      border-left: 0em;
+      border-right: 0em;
+  
+      border-color: #2c313c;
+  
+      outline: 0;
+  
+      font-family: "gothambold";
+      color: white;
+  
+      text-align: center;
+    }
+  
+    p {
+      padding-top: 1em;
+      color: #c3c3c5;
+      font-family: "aptosLight";
+    }
+  
+    a {
+      color: #c3c3c5;
+    }
   }
 }
+

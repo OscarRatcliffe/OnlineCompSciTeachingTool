@@ -1,6 +1,6 @@
 import "./globals.scss";
 
-export const metadata: Metadata = {
+export const metadata: any = {
   title: "Knick Knack",
   description: "Created by Oscar Ratcliffe",
 };

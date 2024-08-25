@@ -12,6 +12,7 @@
   "dependencies": {
     "aes-js": "^3.1.2",
     "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "crypto-random-string": "^5.0.0",
     "dockerode": "^4.0.2",
