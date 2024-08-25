@@ -1,6 +1,8 @@
 # TODO
-- DB container
 - Login portal
+    - Error messages
+- Signup portal
+- Teacher dashboard
 - Teacher create tasks
     - Each task is an object
 - Student open tasks
@@ -20,6 +22,9 @@
 - Login / sessionID function
 - Auth check func
 - Docker compose setup
+- CORS and other middleware
+- Frontend login page
+- Error messages
 - Create spawner module
 
 # Prototype stages
