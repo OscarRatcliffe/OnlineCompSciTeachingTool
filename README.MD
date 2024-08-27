@@ -4,7 +4,7 @@
 - Signup portal
 - Teacher dashboard
 - Teacher create tasks
-    - Each task is an object
+    - Each task is an objects
 - Student open tasks
 - Online code editor
 - Remote running
@@ -26,6 +26,11 @@
 - Frontend login page
 - Error messages
 - Sign up page / backend
+- Main page
+    - Cookie check
+    - Get classes list
+    - Create class
+- Docker backend IP calc
 
 # Prototype stages
 - Teacher login, create class, create students
