@@ -25,7 +25,7 @@
 - CORS and other middleware
 - Frontend login page
 - Error messages
-- Create spawner module
+- Sign up page
 
 # Prototype stages
 - Teacher login, create class, create students
