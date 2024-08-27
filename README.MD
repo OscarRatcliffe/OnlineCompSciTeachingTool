@@ -25,7 +25,7 @@
 - CORS and other middleware
 - Frontend login page
 - Error messages
-- Sign up page
+- Sign up page / backend
 
 # Prototype stages
 - Teacher login, create class, create students
