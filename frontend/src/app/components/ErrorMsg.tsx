@@ -5,20 +5,22 @@ import { useEffect, useRef } from 'react';
 export default function ErrorMsg(props: any) { //Pass in values from calling page
   const msgBoxRef = useRef<HTMLDivElement>(null); //Create null Div reference to assign later
 
-  useEffect(() => {
+  useEffect(() => { //Run on element load
 
-    const msgBox = msgBoxRef.current; //Set the msgBox object to control the div element
+    const msgBox = msgBoxRef.current as HTMLDivElement; //Set the msgBox object to control the div element
 
-    if (msgBox) {
+    console.log("Error message loaded")
 
-      const timer = setTimeout(() => { //Wait before fade out
+    msgBox.style.opacity = '1';
 
-        msgBox.style.opacity = '0'; // Fade out
+    const timer = setTimeout(() => { //Wait before fade out
 
-      }, 3000);
+      msgBox.style.opacity = '0'; // Fade out
 
-      return () => clearTimeout(timer);
-    }
+    }, 3000);
+
+    return () => clearTimeout(timer);
+
   }, []);
   
   return (

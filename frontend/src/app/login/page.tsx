@@ -2,11 +2,28 @@
 import styles from "./page.module.scss";
 import axios from "axios";
 import ErrorMsg from "../components/ErrorMsg";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function login() {
 
-  const [errorText, seterrorText] = useState("Internal error")
+  const [errorText, setErrorText] = useState("Internal error")
+  const [errorVisible, setErrorVisible] = useState(false)
+
+  // Set error back to invisible after being shown
+  useEffect(() => { //Run on page update
+
+    if (errorVisible) {
+
+      const timer = setTimeout(() => { //Wait before fade out
+
+        setErrorVisible(false)
+  
+      }, 4000); //Wait until element has faded out
+  
+      return () => clearTimeout(timer);
+    }
+
+  }, [errorVisible]);
 
   function setCookie(name: string, value: string, days:number) {
 
@@ -20,7 +37,7 @@ export default function login() {
   
   function loginHandler(event: any){
   
-      event.preventDefault();
+      event.preventDefault(); //Stops deafult form behavior
       const formData = new FormData(event.currentTarget); //Get username and password data 
   
       const username = formData.get('username');
@@ -34,39 +51,54 @@ export default function login() {
             'username': username.toString(),
             'password': password.toString()
           }
-        }).then(function(response) {
+        }).then(function(response) {  
   
-          if(response.status = 200) {
-  
-            // Save cookie for session token
-            setCookie("sessionID", response.data, 7)
-  
-            //Reroute user to dashboard
-            window.location.href = "/"
-  
-          } else if(response.status = 401) {
-  
-            seterrorText("Incorect Username / Password")
-  
-          } else {
-  
-            seterrorText(`Unexpected error - ${response.status}`)
-  
+          // Save cookie for session token
+          setCookie("sessionID", response.data, 7)
+
+          //Reroute user to dashboard
+          window.location.href = "/"
+
+
+        }).catch(function(error) { //Error handling
+
+          switch(error.response.status) { //Switch instead of if to make adding codes easier down the line
+
+            case 401:
+
+              setErrorText("Incorect Username / Password");
+              break;
+
+            case 500:
+
+              setErrorText("Internal server error")
+              break;
+              
+
+            default:
+
+              setErrorText(`Unexpected error - ${error.response.status}`)
+
           }
-          
+
+          setErrorVisible(true) //Show error message
+
         })
-  
       }
-  
-  }
+      }
 
   return (
     <div className={styles.main}>
 
-      <ErrorMsg
-        id="error"
-        error={errorText}
-      ></ErrorMsg>
+      {errorVisible && (
+
+        <ErrorMsg
+          key={errorVisible.toString()} //Force reloads element
+          id="error"
+          error={errorText}
+        ></ErrorMsg>
+
+      )}
 
       <div className={styles.login}>
 
