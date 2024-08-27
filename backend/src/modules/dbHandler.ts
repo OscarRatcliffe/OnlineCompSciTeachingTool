@@ -33,16 +33,15 @@ async function login(username:string, password:string): Promise<[number, string]
     }
 
     // Custom error handling
-    if (typeof(passwordRes.rowCount) == null) {
+    if (typeof(passwordRes.rowCount) == null) { //SQL Error
 
-        throw error("ERROR: SQL Response malformed") // Used in testing
-        HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR //Used in production
+        HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR
 
-    } else if (passwordRes.rowCount == 0) {
+    } else if (passwordRes.rowCount == 0) { //Cannot find in DB
 
         HTTPCode = StatusCodes.UNAUTHORIZED //Username not in DB - Not relayed to user for security
 
-    } else if (passwordRes.rowCount !> 1) {
+    } else if (passwordRes.rowCount !> 1) { //More than 1 version of username in DB
 
         throw error("ERROR Username duplicate - Check Sign Up method")
         
@@ -187,9 +186,40 @@ async function authCheck(sessionID:string): Promise<[userGroup, Array<number>] |
     }
     
     return null
-
-    
-
 }
 
-export {authCheck, login};
+//Teacher Signup
+async function teacherSignup(username:string, password:string): Promise<number> { //HTTPCode
+
+    //Check if already exists
+    let sessionRes = await client.query(`SELECT username FROM teacher WHERE username='${username}'`)
+
+    if(typeof(sessionRes.rowCount) == null) { //Check for SQL error
+
+        return StatusCodes.INTERNAL_SERVER_ERROR
+
+    } else { 
+
+        if(sessionRes.rowCount as number > 0) { //Username found in DB
+
+            return StatusCodes.CONFLICT
+    
+        } else {
+
+                //Hash password
+                const saltRounds:number = 10 //How many times to salt password
+
+                await bcrypt.genSalt(saltRounds, async function(err, salt) { //Crate password salt
+                    await bcrypt.hash(password, salt, async function(err, hash) { //Hash password
+
+                        //Add entry to DB
+                        await client.query(`INSERT INTO teacher (username,password) VALUES ('${username}','${hash}')`)  
+                    });
+                })
+                
+            return StatusCodes.CREATED
+        }
+    }
+}
+
+export {authCheck, login, teacherSignup};

@@ -4,7 +4,7 @@ import express from 'express';
 import cors from 'cors';
 const app = express();
 // Custom libraries
-import { authCheck, login } from "./modules/dbHandler.js";
+import { authCheck, login, teacherSignup } from "./modules/dbHandler.js";
 import spawnContainer from "./modules/spawner.js";
 //CORS
 app.use(cors());
@@ -41,27 +41,36 @@ app.get('/testCreation', async (req, res) => {
 //Login script
 app.get('/login', async (req, res) => {
     // Get post request data
-    const postData = {
+    const reqData = {
         "Username": req.headers.username,
         "Password": req.headers.password
     };
-    console.log(postData.Username, postData.Password);
     try {
-        const loginCheckRes = await login(postData.Username.toLowerCase(), postData.Password); //Check if username and password is correct
+        const loginCheckRes = await login(reqData.Username.toLowerCase(), reqData.Password); //Check if username and password is correct
         const auth = loginCheckRes[0];
         const sessionID = loginCheckRes[1];
         // Only return information if username and password is correct
-        if (auth == 200) {
+        if (auth == 200) { //User found
             res.status(200); //Set HTTP code
             res.send(sessionID);
         }
-        else {
+        else { //Error occured 
             res.sendStatus(auth);
         }
     }
-    catch {
+    catch { //Internal error
         res.sendStatus(500);
     }
+});
+//Teacher sign up
+app.get('/teacherSignUp', async (req, res) => {
+    // Get post request data
+    const reqData = {
+        "Username": req.headers.username,
+        "Password": req.headers.password
+    };
+    const loginCheckRes = await teacherSignup(reqData.Username.toLowerCase(), reqData.Password); //Check if username and password is correct
+    res.sendStatus(loginCheckRes);
 });
 // Start webserver
 app.listen(3000, () => {
