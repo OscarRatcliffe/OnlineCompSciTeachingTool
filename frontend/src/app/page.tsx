@@ -1,18 +1,23 @@
 'use client'
+import { useEffect } from "react";
 import styles from "./page.module.scss";
 import cookie from 'cookie';
 
 export default function Home() {
 
+  useEffect(() => { //On page load
 
-  //Check for login cookie
-  let cookiesParsed = cookie.parse(document.cookie); 
-  
-  if(cookiesParsed.sessionID == undefined) {
+    //Check for login cookie
+    let cookiesParsed = cookie.parse(document.cookie); 
+    
+    if(cookiesParsed.sessionID == undefined) {
 
-    window.location.href = "/login" //If no cookie go to login page
+      window.location.href = "/login" //If no cookie go to login page
 
-  }
+    }
+
+    console.log(process.env.NEXT_PUBLIC_HOST_IP)
+  }, []);
 
 
   return (
