@@ -1,7 +1,4 @@
 # TODO
-- Login portal
-    - Error messages
-- Signup portal
 - Teacher dashboard
 - Teacher create tasks
     - Each task is an objects
