@@ -8,7 +8,7 @@ import { log } from 'console';
 const app = express()
 
 // Custom libraries
-import { authCheck, login, teacherSignup } from "./modules/dbHandler.js";
+import { authCheck, login, teacherSignup, getTaskList } from "./modules/dbHandler.js";
 import spawnContainer from "./modules/spawner.js";
 
 //CORS
@@ -112,7 +112,75 @@ app.get('/teacherSignUp', async (req:any, res:any) => {
 
 })
 
+//Get task list
+app.get('/getTaskList', async (req:any, res:any) => {
+ 
+    // Get post request data
+    const reqData = {
+        "classID": req.headers.classid,
+        "sessionID": req.headers.sessionid
+    }
+
+    let checkAuth: authCheckFormat | null = await authCheck(reqData.sessionID) 
+
+    console.log("Auth result: " + checkAuth)
+
+    if (checkAuth != null) {
+
+        // Check if user is in class
+        if(reqData.classID.indexOf(checkAuth.classes) !== -1) {
+
+            res.status(200)
+
+            let tasks = await getTaskList(reqData.classID)
+
+            console.log(tasks)
+
+            res.send(tasks)
+
+        } else {
+
+            res.sendStatus(403)
+
+        }
+       
+
+    } else {
+
+        res.sendStatus(403)
+
+    }
+
+})
+
+//Auth check
+app.get('/AuthCheck', async (req:any, res:any) => {
+ 
+    // Get post request data
+    const reqData = {
+        "sessionID": req.headers.sessionID
+    }
+
+    let checkAuth:authCheckFormat | null = await authCheck(reqData.sessionID)
+
+    if (checkAuth != null) {
+
+        res.status(200)
+
+        res.sendStatus({
+            "userType": checkAuth.userType,
+            "classes": checkAuth.classes
+        })
+
+    } else {
+        // If invalid token error
+        res.sendStatus(403)
+    }
+
+})
+
 // Start webserver
 app.listen(3000, () => {
     console.log(`App running on port 3000`)
   })
+

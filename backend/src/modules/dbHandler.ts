@@ -4,6 +4,7 @@ import cryptoRandomString from 'crypto-random-string';
 import bcrypt from 'bcryptjs'
 import { error } from 'console'
 import { StatusCodes } from 'http-status-codes'
+import task from 'node-docker-api/lib/task';
 
 // Connect to DB
 const { Client } = pg
@@ -121,7 +122,7 @@ async function login(username:string, password:string): Promise<[number, string]
 }
 
 // Check user permissions
-async function authCheck(sessionID:string): Promise<[userGroup, Array<number>] | null> { //Access Level, Class / Token not valid
+async function authCheck(sessionID:string): Promise<authCheckFormat | null> { //Access Level, Class / Token not valid
 
     let classes: Array<number> = []
     let validAuth:boolean = true;
@@ -131,7 +132,8 @@ async function authCheck(sessionID:string): Promise<[userGroup, Array<number>] |
 
     if (sessionRes.rowCount == 0) { //If cant find student check teachers
 
-        sessionRes = await client.query(`SELECT ID, session_expires FROM teacher WHERE last_session_id='${sessionID}'`) //Get password field for teacher
+        // sessionRes = await client.query(`SELECT ID, session_expires FROM teacher WHERE last_session_id='${sessionID}'`) //Get password field for teacher
+        console.log(`SELECT ID, session_expires FROM teacher WHERE last_session_id='${sessionID}'`) //Get password field for teacher)
         userType = "Teacher"
 
     }
@@ -144,6 +146,7 @@ async function authCheck(sessionID:string): Promise<[userGroup, Array<number>] |
     } else if (sessionRes.rowCount == 0) {
 
         validAuth = false
+        console.log("Session ID not found", userType)
 
     } else if (sessionRes.rowCount !> 1) {
 
@@ -157,6 +160,7 @@ async function authCheck(sessionID:string): Promise<[userGroup, Array<number>] |
 
         if (sessionRes.rows[0].session_expires < days) {
             validAuth = false
+            console.log("Session ID expired")
         }
 
         // Calculate classes
@@ -181,11 +185,44 @@ async function authCheck(sessionID:string): Promise<[userGroup, Array<number>] |
 
     if (validAuth) {
 
-        return [userType, classes]
+        return {
+            "userType": userType,
+            "classes": classes
+        }
 
     }
     
     return null
+}
+
+//Get task list
+async function getTaskList(classID:number): Promise<Array<taskListFormat> | null> {
+    
+    let taskList = await client.query(`SELECT id, title, deadline FROM task WHERE class='${classID}'`)
+
+    // Return null if no tasks found
+    if(taskList.rowCount as number == 0) {
+
+        return null
+
+    } else {
+
+        let tasks: Array<taskListFormat> = []
+
+        for (let i = 0; i < taskList.rows.length; i++) {
+
+            tasks.push({
+                "ID": taskList.rows[i].id,
+                "Title": taskList.rows[i].title,
+                "Deadline": taskList.rows[i].deadline,
+            })
+
+        }
+
+        return tasks
+
+    }
+
 }
 
 //Teacher Signup
@@ -222,4 +259,4 @@ async function teacherSignup(username:string, password:string): Promise<number> 
     }
 }
 
-export {authCheck, login, teacherSignup};
+export {authCheck, login, teacherSignup, getTaskList};

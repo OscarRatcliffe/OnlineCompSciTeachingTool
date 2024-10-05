@@ -84,7 +84,8 @@ async function authCheck(sessionID) {
     let sessionRes = await client.query(`SELECT class, session_expires FROM student WHERE last_session_id='${sessionID}'`); //Get password field for student
     let userType = "Student";
     if (sessionRes.rowCount == 0) { //If cant find student check teachers
-        sessionRes = await client.query(`SELECT ID, session_expires FROM teacher WHERE last_session_id='${sessionID}'`); //Get password field for teacher
+        // sessionRes = await client.query(`SELECT ID, session_expires FROM teacher WHERE last_session_id='${sessionID}'`) //Get password field for teacher
+        console.log(`SELECT ID, session_expires FROM teacher WHERE last_session_id='${sessionID}'`); //Get password field for teacher)
         userType = "Teacher";
     }
     // Custom error handling
@@ -93,6 +94,7 @@ async function authCheck(sessionID) {
     }
     else if (sessionRes.rowCount == 0) {
         validAuth = false;
+        console.log("Session ID not found", userType);
     }
     else if (sessionRes.rowCount > 1) {
         throw error("Session token duplicate - Check Login method");
@@ -103,6 +105,7 @@ async function authCheck(sessionID) {
         const days = Math.floor(epochTime / 86400000);
         if (sessionRes.rows[0].session_expires < days) {
             validAuth = false;
+            console.log("Session ID expired");
         }
         // Calculate classes
         if (userType == "Student") {
@@ -117,9 +120,31 @@ async function authCheck(sessionID) {
         }
     }
     if (validAuth) {
-        return [userType, classes];
+        return {
+            "userType": userType,
+            "classes": classes
+        };
     }
     return null;
+}
+//Get task list
+async function getTaskList(classID) {
+    let taskList = await client.query(`SELECT id, title, deadline FROM task WHERE class='${classID}'`);
+    // Return null if no tasks found
+    if (taskList.rowCount == 0) {
+        return null;
+    }
+    else {
+        let tasks = [];
+        for (let i = 0; i < taskList.rows.length; i++) {
+            tasks.push({
+                "ID": taskList.rows[i].id,
+                "Title": taskList.rows[i].title,
+                "Deadline": taskList.rows[i].deadline,
+            });
+        }
+        return tasks;
+    }
 }
 //Teacher Signup
 async function teacherSignup(username, password) {
@@ -145,4 +170,4 @@ async function teacherSignup(username, password) {
         }
     }
 }
-export { authCheck, login, teacherSignup };
+export { authCheck, login, teacherSignup, getTaskList };

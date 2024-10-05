@@ -4,7 +4,7 @@ import express from 'express';
 import cors from 'cors';
 const app = express();
 // Custom libraries
-import { authCheck, login, teacherSignup } from "./modules/dbHandler.js";
+import { authCheck, login, teacherSignup, getTaskList } from "./modules/dbHandler.js";
 import spawnContainer from "./modules/spawner.js";
 //CORS
 app.use(cors());
@@ -71,6 +71,50 @@ app.get('/teacherSignUp', async (req, res) => {
     };
     const loginCheckRes = await teacherSignup(reqData.Username.toLowerCase(), reqData.Password); //Check if username and password is correct
     res.sendStatus(loginCheckRes);
+});
+//Get task list
+app.get('/getTaskList', async (req, res) => {
+    // Get post request data
+    const reqData = {
+        "classID": req.headers.classid,
+        "sessionID": req.headers.sessionid
+    };
+    let checkAuth = await authCheck(reqData.sessionID);
+    console.log("Auth result: " + checkAuth);
+    if (checkAuth != null) {
+        // Check if user is in class
+        if (reqData.classID.indexOf(checkAuth.classes) !== -1) {
+            res.status(200);
+            let tasks = await getTaskList(reqData.classID);
+            console.log(tasks);
+            res.send(tasks);
+        }
+        else {
+            res.sendStatus(403);
+        }
+    }
+    else {
+        res.sendStatus(403);
+    }
+});
+//Auth check
+app.get('/AuthCheck', async (req, res) => {
+    // Get post request data
+    const reqData = {
+        "sessionID": req.headers.sessionID
+    };
+    let checkAuth = await authCheck(reqData.sessionID);
+    if (checkAuth != null) {
+        res.status(200);
+        res.sendStatus({
+            "userType": checkAuth.userType,
+            "classes": checkAuth.classes
+        });
+    }
+    else {
+        // If invalid token error
+        res.sendStatus(403);
+    }
 });
 // Start webserver
 app.listen(3000, () => {

@@ -5,3 +5,19 @@ type loginFormat = {
     "Username": string,
     "Password": string
 }
+
+type classFormat = {
+    "ID": number,
+    "Name": string
+}
+
+type authCheckFormat = {
+    "userType": userGroup,
+    "classes": Array<number> 
+} 
+
+type taskListFormat = {
+    "ID": number,
+    "Title": string,
+    "Deadline": number
+}
