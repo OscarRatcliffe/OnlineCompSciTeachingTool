@@ -1,5 +1,10 @@
 # TODO
+- Student dashboard
+    - Fetch task list
 - Teacher dashboard
+    - Check user type
+    - View classes
+    - Create classes
 - Teacher create tasks
     - Each task is an objects
 - Student open tasks
@@ -8,6 +13,7 @@
 - Interactive terminal
 - Solution marking
 
+- Pass in host IP to docker for backend access
 - Pass login info in body not URL
 
 # Write up structure
@@ -26,8 +32,10 @@
 - Main page
     - Cookie check
     - Get classes list
+    - Dynamically list classes
+    - Switch between classes
     - Create class
-- Docker backend IP calc
+- 
 
 # Prototype stages
 - Teacher login, create class, create students
