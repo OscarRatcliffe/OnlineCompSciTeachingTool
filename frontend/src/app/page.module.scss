@@ -1,7 +1,8 @@
 .main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 20% 1fr;
+  grid-template-rows: 3em 1fr; 
+  text-align: center;
   min-height: 100vh;
   width: 100%;
   background-color: #1f1e25;
@@ -9,4 +10,64 @@
   font-optical-sizing: auto;
   font-style: normal;
   color: white;
+
+  .titleBar {
+    grid-area: 1 / 2 / 2 / 3;
+    background-color: #1c1b22;
+
+    .Title {
+      font-family: "gothambold";
+      font-size: 1.6em;
+      padding-top: 0.3em;
+      padding-bottom: 1em;
+      color: white;
+    }
+
+  }
+
+  .classBar {
+    grid-area: 1 / 1 / 3 / 2;
+    background-color: #1c1b22;
+    color: rgb(163, 163, 163);
+
+    .Title {
+      font-family: "gothambold";
+      font-size: 1.6em;
+      padding-top: 0.3em;
+      padding-bottom: 0.5em;
+      color: white;
+    }
+
+    #Selected{
+      color: white;
+    }
+
+    .Item {
+  
+      width: 70%;
+      height: 4em;
+      margin-left: 15%;
+      
+      text-align: center;
+
+      cursor: pointer;
+  
+  
+      .Text {
+        font-size: 1.3em;
+  
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+  }
+
+  .mainPage {
+    grid-area: 2 / 2 / 3 / 3;
+    background-color: #1f1e25;
+  }
+
+  
 }
