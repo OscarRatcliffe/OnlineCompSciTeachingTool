@@ -1,7 +1,21 @@
 'use client'
+import React from 'react';
 import { useState, useEffect } from "react";
+import axios from "axios";
 import styles from "./page.module.scss";
 import cookie from 'cookie';
+
+type Class = Array<{
+  name: string;
+  id: number;
+  selected: boolean;
+}>
+
+type taskListFormat = {
+  "ID": number,
+  "Title": string,
+  "Deadline": number
+}
 
 export default function Home() {
 
@@ -9,37 +23,163 @@ export default function Home() {
 
   const [currentClass, setCurrentClass] = useState(0);
 
-  const [classesList, setClassesList] = useState([
-   {
-    "name": "Test class",
-    "id": 0,
-    "selected": true
-  },{
-    "name": "Year 12 2024-2025",
-    "id": 1,
-    "selected": false
-  }])
+  const [classesList, setClassesList] = useState([{}])
+
+  const [sessionID, setSessionID] = useState('')
+
+  const [taskList, setTaskList] = useState<Array<taskListFormat>>([])
+
+  function changeClass(classID: number): void {
+
+    for (let i = 0; i < (classesList as Class).length; i++) {
+
+      if((classesList as Class)[i].id == currentClass) {
+
+        (classesList as Class)[i].selected = false;
+
+      }
+
+      else if((classesList as Class)[i].id == classID) {
+
+        (classesList as Class)[i].selected = true; 
+
+      }
+
+    }
+
+    setCurrentClass(classID)
+  }
+
+  function checkAuth(sessionID: string) {
+
+    axios.get("http://localhost:3000/AuthCheck", {
+
+      headers: {
+        'sessionid': sessionID
+      }
+
+    }).then(function(response) {
+
+      if(response.data.userType == "Student") {
+
+        setIsTeacher(false)
+
+      } else {
+
+        setIsTeacher(true)
+
+      }
+
+      // Error if no teachers found
+      if (response.data.classes.length == 0) {
+
+        setClassesList([{
+              "name": "",
+              "id": -1,
+              "selected": true
+            }])
+
+      } else {
+
+        let newClassesList = []
+
+        for(let i = 0; i < response.data.classes.length; i++) {   
+
+          newClassesList.push({
+            "name": response.data.classes[i].Name,
+            "id": response.data.classes[i].ID,
+            "selected": false
+          })   
+           
+        }
+
+        // Populate task list for deafult task
+        taskListHandler(newClassesList[0].id, sessionID)
+
+        // Auto select first class in list
+        newClassesList[0].selected = true
+  
+        setCurrentClass(newClassesList[0].id)
+  
+        setClassesList(newClassesList)
+
+      }
+
+    }).catch(function(error) {
+
+      if(error.response.status == 403) {
+
+        document.cookie = "sessionID=; Max-Age=0"
+        window.location.href = "/login"
+
+      }
+
+    })
+
+  }
+
+  function taskListHandler(currentClass: number, sessionID: string) {
+
+    let returnValue: Array<taskListFormat> = []
+
+    console.log(currentClass, sessionID)
+
+    axios.get("http://localhost:3000/getTaskList", {
+      headers: {
+        "classid": currentClass,
+        "sessionid": sessionID
+      }
+      }).then(function(response) {
+
+        for (let i = 0; i < response.data.length; i++) {
+
+          returnValue.push({
+            "ID": response.data[i].ID,
+            "Title": response.data[i].Title,
+            "Deadline": response.data[i].Deadline
+          })
+        }
+
+    }).catch(function(error) {})
+
+    console.log(returnValue)
+
+    setTaskList(returnValue)
+   
+  }
 
   useEffect(() => { //On page load
 
-    //Check for login cookie
     let cookiesParsed = cookie.parse(document.cookie); 
-    
-    if(cookiesParsed.sessionID == undefined) {
+    setSessionID(cookiesParsed.sessionID);
+
+    //Check for login cookie
+    if(sessionID == undefined) {
 
       window.location.href = "/login" //If no cookie go to login page
 
     }
 
-    console.log(process.env.NEXT_PUBLIC_HOST_IP)
+    checkAuth(cookiesParsed.sessionID) 
+
   }, []);
 
-  function changeClass(classID: number): void {
+  //Return the index of a class given its ID
+  function getClassIndex(classID: number): number {
 
-    classesList[classID].selected = true
-    classesList[currentClass].selected = false
+    let returnValue = 0
 
-    setCurrentClass(classID)
+    for (let i = 0; i < classesList.length; i++) {
+
+      if ((classesList[i] as {id: number}).id == classID) {
+
+        returnValue = i
+      }
+
+    }
+
+    return returnValue
+
   }
 
   // Render different pages for students and teachers
@@ -57,11 +197,13 @@ export default function Home() {
 
         <h1 className={styles.Title}>CLASSES</h1>
 
-        <>
           {
             classesList.map((classItem: any) => (
               <div
-              onClick={() => changeClass(classItem.id)}
+              onClick={() => {
+                changeClass(classItem.id)
+                taskListHandler(currentClass, sessionID) //Update task lists
+              }}
               className={styles.Item}
               id={classItem.selected && styles.Selected}
               key={classItem.id}>
@@ -71,14 +213,18 @@ export default function Home() {
               </div>
             ))
           }
-        </>
-
-      {/* TODO: Create new class */}
       </div>
 
-      <div className={styles.mainPage}>
+      <div className={styles.mainPage} key={currentClass}>
 
-          <p>{classesList[currentClass].name}</p>
+            {
+                taskList.map((taskItem: any) => (
+                  <div key={taskItem.ID}>
+                    <p>{taskItem.Title}</p>
+                    <p>{taskItem.ID}</p>
+                  </div>
+                ))
+              }
 
       </div>
       
