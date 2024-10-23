@@ -42,7 +42,7 @@ app.get('/testCreation', async (req, res) => {
 app.get('/login', async (req, res) => {
     // Get post request data
     const reqData = {
-        "Username": req.headers.username,
+        "Username": req.headers.username, //Test if HTTPS encyrpts headers
         "Password": req.headers.password
     };
     try {
@@ -81,19 +81,19 @@ app.get('/getTaskList', async (req, res) => {
     };
     let checkAuth = await authCheck(reqData.sessionID);
     console.log("Auth result: " + checkAuth);
+    let validAuth = false;
     if (checkAuth != null) {
         // Check if user is in class
-        if (reqData.classID.indexOf(checkAuth.classes) !== -1) {
-            res.status(200);
-            let tasks = await getTaskList(reqData.classID);
-            console.log(tasks);
-            res.send(tasks);
-        }
-        else {
-            res.sendStatus(403);
+        for (let i = 0; i < checkAuth.classes.length; i++) {
+            if (checkAuth.classes[i].ID == reqData.classID) {
+                validAuth = true;
+                res.status(200);
+                let tasks = await getTaskList(reqData.classID);
+                res.send(tasks);
+            }
         }
     }
-    else {
+    if (!validAuth) {
         res.sendStatus(403);
     }
 });
@@ -101,12 +101,12 @@ app.get('/getTaskList', async (req, res) => {
 app.get('/AuthCheck', async (req, res) => {
     // Get post request data
     const reqData = {
-        "sessionID": req.headers.sessionID
+        "sessionID": req.headers.sessionid
     };
     let checkAuth = await authCheck(reqData.sessionID);
     if (checkAuth != null) {
         res.status(200);
-        res.sendStatus({
+        res.send({
             "userType": checkAuth.userType,
             "classes": checkAuth.classes
         });

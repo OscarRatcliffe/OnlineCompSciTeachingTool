@@ -13,7 +13,7 @@ type classFormat = {
 
 type authCheckFormat = {
     "userType": userGroup,
-    "classes": Array<number> 
+    "classes": Array<classFormat> 
 } 
 
 type taskListFormat = {

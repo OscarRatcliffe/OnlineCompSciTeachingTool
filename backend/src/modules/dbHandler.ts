@@ -124,16 +124,16 @@ async function login(username:string, password:string): Promise<[number, string]
 // Check user permissions
 async function authCheck(sessionID:string): Promise<authCheckFormat | null> { //Access Level, Class / Token not valid
 
-    let classes: Array<number> = []
+    let classes: Array<classFormat> = []
     let validAuth:boolean = true;
 
     let sessionRes = await client.query(`SELECT class, session_expires FROM student WHERE last_session_id='${sessionID}'`) //Get password field for student
+    
     let userType: userGroup = "Student"
 
     if (sessionRes.rowCount == 0) { //If cant find student check teachers
 
-        // sessionRes = await client.query(`SELECT ID, session_expires FROM teacher WHERE last_session_id='${sessionID}'`) //Get password field for teacher
-        console.log(`SELECT ID, session_expires FROM teacher WHERE last_session_id='${sessionID}'`) //Get password field for teacher)
+        sessionRes = await client.query(`SELECT ID, session_expires FROM teacher WHERE last_session_id='${sessionID}'`) //Get password field for teacher
         userType = "Teacher"
 
     }
@@ -163,23 +163,18 @@ async function authCheck(sessionID:string): Promise<authCheckFormat | null> { //
             console.log("Session ID expired")
         }
 
-        // Calculate classes
-        if (userType == "Student") {
+        const classesres = await client.query(`SELECT id, name FROM class WHERE teacher='${sessionRes.rows[0].id}'`)
 
-            classes = [sessionRes.rows[0].class] //Student to classes is many to one so place in an array for consistent function return
+        for (let i = 0; i < classesres.rows.length; i++) {  //Iterate through returned rows
 
-        } else {
-
-            // Look at class table to create a list of classes the teacher teaches
-            const classesres = await client.query(`SELECT id FROM class WHERE teacher='${sessionRes.rows[0].id}'`)
-            
-            for (let i = 0; i < classesres.rows.length; i++) {  //Iterate through returned rows
-
-                classes.push(classesres.rows[i].id)
-
-            }
+            classes.push({
+                "ID": classesres.rows[i].id,
+                "Name": classesres.rows[i].name
+            })
 
         }
+
+    
 
     }
 
@@ -197,7 +192,7 @@ async function authCheck(sessionID:string): Promise<authCheckFormat | null> { //
 
 //Get task list
 async function getTaskList(classID:number): Promise<Array<taskListFormat> | null> {
-    
+
     let taskList = await client.query(`SELECT id, title, deadline FROM task WHERE class='${classID}'`)
 
     // Return null if no tasks found

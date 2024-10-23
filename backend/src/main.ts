@@ -4,7 +4,6 @@ import express from 'express'
 import bodyParser from 'body-parser';
 
 import cors from 'cors';
-import { log } from 'console';
 const app = express()
 
 // Custom libraries
@@ -65,7 +64,7 @@ app.get('/login', async (req:any, res:any) => {
  
     // Get post request data
     const reqData:loginFormat = {
-        "Username": req.headers.username,
+        "Username": req.headers.username, //Test if HTTPS encyrpts headers
         "Password": req.headers.password
     }
 
@@ -125,27 +124,30 @@ app.get('/getTaskList', async (req:any, res:any) => {
 
     console.log("Auth result: " + checkAuth)
 
+    let validAuth = false
+
     if (checkAuth != null) {
 
         // Check if user is in class
-        if(reqData.classID.indexOf(checkAuth.classes) !== -1) {
+        for (let i = 0; i < checkAuth.classes.length; i++) {
+        
+            if (checkAuth.classes[i].ID == reqData.classID) {
 
-            res.status(200)
+                validAuth = true
 
-            let tasks = await getTaskList(reqData.classID)
+                res.status(200)
 
-            console.log(tasks)
+                let tasks = await getTaskList(reqData.classID)
 
-            res.send(tasks)
+                res.send(tasks)
 
-        } else {
-
-            res.sendStatus(403)
+            }
 
         }
-       
 
-    } else {
+    }
+
+    if (!validAuth) {
 
         res.sendStatus(403)
 
@@ -158,7 +160,7 @@ app.get('/AuthCheck', async (req:any, res:any) => {
  
     // Get post request data
     const reqData = {
-        "sessionID": req.headers.sessionID
+        "sessionID": req.headers.sessionid
     }
 
     let checkAuth:authCheckFormat | null = await authCheck(reqData.sessionID)
@@ -167,7 +169,7 @@ app.get('/AuthCheck', async (req:any, res:any) => {
 
         res.status(200)
 
-        res.sendStatus({
+        res.send({
             "userType": checkAuth.userType,
             "classes": checkAuth.classes
         })
@@ -182,5 +184,4 @@ app.get('/AuthCheck', async (req:any, res:any) => {
 // Start webserver
 app.listen(3000, () => {
     console.log(`App running on port 3000`)
-  })
-
+})
