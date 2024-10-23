@@ -31,14 +31,16 @@
 - Sign up page / backend
 - Main page
     - Cookie check
+    - Auth check
     - Get classes list
     - Dynamically list classes
     - Switch between classes
+    
+- Main page teacher 
     - Create class
-- 
+    - Create students
 
 # Prototype stages
-- Teacher login, create class, create students
-- Teacher create task
+- Teacher login, create class, create students, create task
 - Student work on / run task
 - Task submission / review
