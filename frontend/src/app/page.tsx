@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import styles from "./page.module.scss";
 import cookie from 'cookie';
+import task from 'node-docker-api/lib/task';
 
 type Class = Array<{
   name: string;
@@ -216,6 +217,8 @@ export default function Home() {
       </div>
 
       <div className={styles.mainPage} key={currentClass}>
+
+            <p>{taskList[0].Title}</p>
 
             {
                 taskList.map((taskItem: any) => (
