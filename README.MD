@@ -19,12 +19,12 @@
 # Write up structure
 - DB container
 - DB tables / references
-- TS Create custom types / setup
+- Creating backend
 - Connecting DB to TS
 - TS create API endpoint
+- Creating frontend
 - Login / sessionID function
 - Auth check func
-- Docker compose setup
 - CORS and other middleware
 - Frontend login page
 - Error messages
@@ -39,6 +39,8 @@
 - Main page teacher 
     - Create class
     - Create students
+
+- Create container initial attempt - Talk about challenges
 
 # Prototype stages
 - Teacher login, create class, create students, create task

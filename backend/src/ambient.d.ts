@@ -11,13 +11,13 @@ type classFormat = {
     "Name": string
 }
 
-type authCheckFormat = {
-    "userType": userGroup,
-    "classes": Array<classFormat> 
-} 
-
 type taskListFormat = {
     "ID": number,
     "Title": string,
     "Deadline": number
 }
+
+type authCheckFormat = {
+    "userType": userGroup,
+    "classes": Array<classFormat> 
+} 
