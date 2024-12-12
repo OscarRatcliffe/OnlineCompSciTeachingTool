@@ -36,7 +36,7 @@ async function login(username:string, password:string): Promise<[number, string]
     // Custom error handling
     if (typeof(passwordRes.rowCount) == null) { //SQL Error
 
-        HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR
+        console.log("ERROR IN SQL REQUEST")
 
     } else if (passwordRes.rowCount == 0) { //Cannot find in DB
 
