@@ -181,6 +181,17 @@ app.get('/AuthCheck', async (req:any, res:any) => {
 
 })
 
+//Test endpoint
+app.get('/test', async (req: any, res: any) => {
+
+    res.status(200)
+    res.send({
+        "Working": "Yep",
+        "Favourite number": 11
+    })
+
+})
+
 // Start webserver
 app.listen(3000, () => {
     console.log(`App running on port 3000`)
