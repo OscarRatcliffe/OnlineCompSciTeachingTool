@@ -25,7 +25,7 @@
 - Creating frontend
 - Login / sessionID function
 - Auth check func
-- CORS and other middleware
+- CORS and other middleware - Issue when first runnings
 - Frontend login page
 - Error messages
 - Sign up page / backend
