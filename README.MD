@@ -35,9 +35,12 @@
     - Get classes list
     - Dynamically list classes
     - Switch between classes
+    - Get task list
+        - View tasks
     
 - Main page teacher 
     - Create class
+        - Set taks 
     - Create students
 
 - Create container initial attempt - Talk about challenges
