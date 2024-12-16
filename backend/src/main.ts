@@ -64,7 +64,7 @@ app.get('/login', async (req:any, res:any) => {
  
     // Get post request data
     const reqData:loginFormat = {
-        "Username": req.headers.username, //Test if HTTPS encyrpts headers
+        "Username": req.headers.username, //TODO: Encryption on data transmission
         "Password": req.headers.password
     }
 
