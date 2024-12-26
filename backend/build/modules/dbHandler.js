@@ -26,7 +26,7 @@ async function login(username, password) {
     }
     // Custom error handling
     if (typeof (passwordRes.rowCount) == null) { //SQL Error
-        HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR;
+        console.log("ERROR IN SQL REQUEST");
     }
     else if (passwordRes.rowCount == 0) { //Cannot find in DB
         HTTPCode = StatusCodes.UNAUTHORIZED; //Username not in DB - Not relayed to user for security

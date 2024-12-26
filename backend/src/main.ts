@@ -1,17 +1,16 @@
 // Librarys
 import fs from 'fs';
 import express from 'express'
-import bodyParser from 'body-parser';
 
-import cors from 'cors';
 const app = express()
+
+//CORS
+import cors from 'cors';
+app.use(cors());
 
 // Custom libraries
 import { authCheck, login, teacherSignup, getTaskList } from "./modules/dbHandler.js";
 import spawnContainer from "./modules/spawner.js";
-
-//CORS
-app.use(cors());
 
 // Get test script
 const pythonScript = fs.readFileSync('test.py', 'utf8');

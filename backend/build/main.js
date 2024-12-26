@@ -1,13 +1,13 @@
 // Librarys
 import fs from 'fs';
 import express from 'express';
-import cors from 'cors';
 const app = express();
+//CORS
+import cors from 'cors';
+app.use(cors());
 // Custom libraries
 import { authCheck, login, teacherSignup, getTaskList } from "./modules/dbHandler.js";
 import spawnContainer from "./modules/spawner.js";
-//CORS
-app.use(cors());
 // Get test script
 const pythonScript = fs.readFileSync('test.py', 'utf8');
 // Create containers
@@ -42,7 +42,7 @@ app.get('/testCreation', async (req, res) => {
 app.get('/login', async (req, res) => {
     // Get post request data
     const reqData = {
-        "Username": req.headers.username, //Test if HTTPS encyrpts headers
+        "Username": req.headers.username, //TODO: Encryption on data transmission
         "Password": req.headers.password
     };
     try {
@@ -115,6 +115,14 @@ app.get('/AuthCheck', async (req, res) => {
         // If invalid token error
         res.sendStatus(403);
     }
+});
+//Test endpoint
+app.get('/test', async (req, res) => {
+    res.status(200);
+    res.send({
+        "Working": "Yep",
+        "Favourite number": 11
+    });
 });
 // Start webserver
 app.listen(3000, () => {
