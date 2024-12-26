@@ -217,16 +217,16 @@ export default function Home() {
 
       <div className={styles.mainPage} key={currentClass}>
 
-            <p>{taskList[0].Title}</p>
+            {/* <p>{taskList[0].Title}</p> */}
 
-            {
+            {/* {
                 taskList.map((taskItem: any) => (
                   <div key={taskItem.ID}>
                     <p>{taskItem.Title}</p>
                     <p>{taskItem.ID}</p>
                   </div>
                 ))
-              }
+              } */}
 
       </div>
       

@@ -28,7 +28,7 @@ export default function login() {
   function setCookie(name: string, value: string, days:number) {
 
     let date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); // Convert days to milliseconds
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); // Convert days to milliseconds 
   
     let expires = "expires=" + date.toUTCString();
   

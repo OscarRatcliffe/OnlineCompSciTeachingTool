@@ -20,6 +20,16 @@
     .LoginText{
       padding-bottom: 1rem;
     }
+
+    p {
+      padding-top: 1em;
+      color: #c3c3c5;
+      font-family: "aptosLight";
+    } 
+
+    a {
+      color: #c3c3c5;
+    } 
   
     .button {
       color: #97979a;
@@ -55,15 +65,6 @@
       text-align: center;
     }
   
-    p {
-      padding-top: 1em;
-      color: #c3c3c5;
-      font-family: "aptosLight";
-    }
-  
-    a {
-      color: #c3c3c5;
-    }
   }
 }
 
