@@ -24,6 +24,8 @@ export default function Home() {
   const [errorText, setErrorText] = useState("Internal error");
   const [errorVisible, setErrorVisible] = useState(false);
 
+  const [createNewUserVisable, setCreateNewUserVisable] = useState(false);
+
   const [isTeacher, setIsTeacher] = useState(true); 
 
   const [currentClass, setCurrentClass] = useState(-1);
@@ -154,10 +156,10 @@ export default function Home() {
    
   }
 
-  function newTaskHandler(event: any){
+  async function newTaskHandler(event: any){
   
     event.preventDefault(); //Stops deafult form behavior
-    const formData = new FormData(event.currentTarget); //Get username and password data 
+    const formData = new FormData(event.currentTarget); 
 
     const title = formData.get('title') as FormDataEntryValue;
     const description = formData.get('description') as FormDataEntryValue;
@@ -165,7 +167,7 @@ export default function Home() {
     console.log(title, description, currentClass, sessionID)
 
       // Get request to backend
-      axios.get("http://localhost:3000/createNewTask", {
+      await axios.get("http://localhost:3000/createNewTask", {
         headers: {
           'title': title.toString(),
           'description': description.toString(),
@@ -199,6 +201,70 @@ export default function Home() {
 
     }
 
+    function newStudentHandler() {
+      setCreateNewUserVisable(true)
+    }
+
+    async function newStudentCreationHandler(event: any) {
+
+    event.preventDefault(); //Stops deafult form behavior
+    const formData = new FormData(event.currentTarget); 
+
+    const username = formData.get('username') as FormDataEntryValue;
+    const password = formData.get('password') as FormDataEntryValue;
+    const passwordCheck = formData.get('passwordCheck') as FormDataEntryValue;
+
+    if(username == "" || password == "") {
+      
+      setErrorText("Please enter a Username & Password");
+      setErrorVisible(true);
+
+    }
+
+    else if(password != passwordCheck) {
+
+      setErrorText("Passwords do not match");
+      setErrorVisible(true);
+
+    } else {
+
+      // Get request to backend
+      await axios.get("http://localhost:3000/studentSignUp", {
+        headers: {
+          'Username': username.toString(),
+          'Password': password.toString(),
+          'classID': currentClass,
+          'sessionID': sessionID
+        }
+
+      }).catch(function(error) { //Error handling
+
+        switch(error.response.status) { //Switch instead of if to make adding codes easier down the line
+
+            case 403:
+              setErrorText("Permissions error")
+              break;
+
+          case 500:
+
+            setErrorText("Internal server error")
+            break;
+            
+
+          default:
+
+            setErrorText(`Unexpected error - ${error.response.status}`)
+
+        }
+
+        setErrorVisible(true) //Show error message
+
+      })
+
+      setCreateNewUserVisable(false)
+    }
+    }
+
 
   useEffect(() => { //On page load
 
@@ -217,7 +283,19 @@ export default function Home() {
       await checkAuth(cookiesParsed.sessionID) 
 
     })();
-  }, []);
+
+    if (errorVisible) {
+
+      const timer = setTimeout(() => { //Wait before fade out
+
+        setErrorVisible(false)
+  
+      }, 4000); //Wait until element has faded out
+  
+      return () => clearTimeout(timer);
+    }
+
+  }, [errorVisible]);
 
   //Return the index of a class given its ID
   function getClassIndex(classID: number): number {
@@ -309,7 +387,37 @@ export default function Home() {
 
               </div>
 
+              <div className={styles.newStudent}> 
+
+
+                <button onClick={newStudentHandler}>Add Student</button>
+
+              </div>
+
       </div>
+
+      {createNewUserVisable && (
+        
+      <div className={styles.newStudentFormBG}>
+      
+          <div className={styles.newStudentForm}>
+          
+                  <h2>NEW STUDENT</h2>
+
+                  <form className={styles.newTaskForm} onSubmit={newStudentCreationHandler}>
+
+                    <input type="text" name="username" placeholder="Username"/>
+                    <input type="password"name="password" placeholder="Password"/>
+                    <input type="password"name="passwordCheck" placeholder="Password Check"/>
+                    <input className={styles.button} type="submit" value="Create User" />
+
+                  </form>
+
+          </div>
+
+      </div>
+
+      )}
       
     </div>
   );

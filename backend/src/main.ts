@@ -9,7 +9,7 @@ import cors from 'cors';
 app.use(cors());
 
 // Custom libraries
-import { authCheck, login, teacherSignup, getTaskList, createNewTask } from "./modules/dbHandler.js";
+import { authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup } from "./modules/dbHandler.js";
 import spawnContainer from "./modules/spawner.js";
 import { title } from 'process';
 
@@ -108,6 +108,53 @@ app.get('/teacherSignUp', async (req:any, res:any) => {
 
     const loginCheckRes = await teacherSignup(reqData.Username.toLowerCase(), reqData.Password) //Check if username and password is correct
     res.sendStatus(loginCheckRes)
+
+})
+
+//Student sign up
+app.get('/studentSignUp', async (req:any, res:any) => {
+ 
+    // Get post request data
+    const reqData = {
+        "Username": req.headers.username,
+        "Password": req.headers.password,
+        "classID": req.headers.classid,
+        "sessionID": req.headers.sessionid
+    }
+
+    console.log(reqData)
+
+    let checkAuth: authCheckFormat | null = await authCheck(reqData.sessionID) 
+
+    console.log(checkAuth)
+
+    if(checkAuth != null) {
+
+        let authFail = true
+
+        for(let i = 0; i < checkAuth.classes.length; i++) {
+            if(checkAuth.classes[i].ID == reqData.classID) {
+                authFail = false
+            }
+        }
+
+        if(authFail) {
+
+            res.sendStatus(403)
+
+        } else {
+
+            const loginCheckRes = await studentSignup(reqData.Username.toLowerCase(), reqData.Password, reqData.classID) //Check if username and password is correct
+            res.sendStatus(loginCheckRes)
+
+        }
+        
+
+    } else {
+
+        res.sendStatus(403)
+
+    }
 
 })
 

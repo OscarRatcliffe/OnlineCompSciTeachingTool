@@ -169,4 +169,28 @@ async function teacherSignup(username, password) {
         }
     }
 }
-export { authCheck, login, teacherSignup, getTaskList, createNewTask };
+//Student sign up
+async function studentSignup(username, password, classID) {
+    //Check if already exists
+    let sessionRes = await client.query(`SELECT username FROM student WHERE username='${username}'`);
+    if (typeof (sessionRes.rowCount) == null) { //Check for SQL error
+        return StatusCodes.INTERNAL_SERVER_ERROR;
+    }
+    else {
+        if (sessionRes.rowCount > 0) { //Username found in DB
+            return StatusCodes.CONFLICT;
+        }
+        else {
+            //Hash password
+            const saltRounds = 10; //How many times to salt password
+            await bcrypt.genSalt(saltRounds, async function (err, salt) {
+                await bcrypt.hash(password, salt, async function (err, hash) {
+                    //Add entry to DB
+                    await client.query(`INSERT INTO student (username,password, class) VALUES ('${username}','${hash}','${classID}')`);
+                });
+            });
+            return StatusCodes.CREATED;
+        }
+    }
+}
+export { authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup };
