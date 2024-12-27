@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import styles from "./page.module.scss";
 import cookie from 'cookie';
+import ErrorMsg from "./components/ErrorMsg";
 
 type Class = Array<{
   name: string;
@@ -14,14 +15,18 @@ type Class = Array<{
 type taskListFormat = {
   "ID": number,
   "Title": string,
-  "Deadline": number
+  "Deadline": number,
+  "Description": string
 }
 
 export default function Home() {
 
+  const [errorText, setErrorText] = useState("Internal error");
+  const [errorVisible, setErrorVisible] = useState(false);
+
   const [isTeacher, setIsTeacher] = useState(true); 
 
-  const [currentClass, setCurrentClass] = useState(0);
+  const [currentClass, setCurrentClass] = useState(-1);
 
   const [classesList, setClassesList] = useState([{}])
 
@@ -50,9 +55,9 @@ export default function Home() {
     setCurrentClass(classID)
   }
 
-  function checkAuth(sessionID: string) {
+  async function checkAuth(sessionID: string) {
 
-    axios.get("http://localhost:3000/AuthCheck", {
+    await axios.get("http://localhost:3000/AuthCheck", {
 
       headers: {
         'sessionid': sessionID
@@ -118,13 +123,13 @@ export default function Home() {
 
   }
 
-  function taskListHandler(currentClass: number, sessionID: string) {
+  async function taskListHandler(currentClass: number, sessionID: string) {
 
     let returnValue: Array<taskListFormat> = []
 
     console.log(currentClass, sessionID)
 
-    axios.get("http://localhost:3000/getTaskList", {
+    await axios.get("http://localhost:3000/getTaskList", {
       headers: {
         "classid": currentClass,
         "sessionid": sessionID
@@ -136,7 +141,8 @@ export default function Home() {
           returnValue.push({
             "ID": response.data[i].ID,
             "Title": response.data[i].Title,
-            "Deadline": response.data[i].Deadline
+            "Deadline": response.data[i].Deadline,
+            "Description": response.data[i].Description
           })
         }
 
@@ -147,6 +153,52 @@ export default function Home() {
     setTaskList(returnValue)
    
   }
+
+  function newTaskHandler(event: any){
+  
+    event.preventDefault(); //Stops deafult form behavior
+    const formData = new FormData(event.currentTarget); //Get username and password data 
+
+    const title = formData.get('title') as FormDataEntryValue;
+    const description = formData.get('description') as FormDataEntryValue;
+
+    console.log(title, description, currentClass, sessionID)
+
+      // Get request to backend
+      axios.get("http://localhost:3000/createNewTask", {
+        headers: {
+          'title': title.toString(),
+          'description': description.toString(),
+          'classID': currentClass,
+          'sessionID': sessionID
+        }
+
+      }).catch(function(error) { //Error handling
+
+        switch(error.response.status) { //Switch instead of if to make adding codes easier down the line
+
+            case 403:
+              setErrorText("Permissions error")
+              break;
+
+          case 500:
+
+            setErrorText("Internal server error")
+            break;
+            
+
+          default:
+
+            setErrorText(`Unexpected error - ${error.response.status}`)
+
+        }
+
+        setErrorVisible(true) //Show error message
+
+      })
+
+    }
+
 
   useEffect(() => { //On page load
 
@@ -160,8 +212,11 @@ export default function Home() {
 
     }
 
-    checkAuth(cookiesParsed.sessionID) 
+    (async () => {
 
+      await checkAuth(cookiesParsed.sessionID) 
+
+    })();
   }, []);
 
   //Return the index of a class given its ID
@@ -184,6 +239,7 @@ export default function Home() {
 
   // Render different pages for students and teachers
   if(isTeacher) {
+
   return (
       <div className={styles.main}>
 
@@ -202,7 +258,8 @@ export default function Home() {
               <div
               onClick={() => {
                 changeClass(classItem.id)
-                taskListHandler(currentClass, sessionID) //Update task lists
+                taskListHandler(classItem.id, sessionID) //Update task lists
+                console.log('current class = ' + classItem.id)
               }}
               className={styles.Item}
               id={classItem.selected && styles.Selected}
@@ -217,16 +274,40 @@ export default function Home() {
 
       <div className={styles.mainPage} key={currentClass}>
 
-            {/* <p>{taskList[0].Title}</p> */}
+            {errorVisible && (
+            
+                    <ErrorMsg
+                      key={errorVisible.toString()} //Force reloads element
+                      id="error"
+                      error={errorText}
+                    ></ErrorMsg>
+            
+                  )}
 
-            {/* {
+            {
                 taskList.map((taskItem: any) => (
-                  <div key={taskItem.ID}>
-                    <p>{taskItem.Title}</p>
-                    <p>{taskItem.ID}</p>
+
+                  <div className={styles.task} key={taskItem.ID}>
+
+                    <h3>{taskItem.Title}</h3>
+                    <p>{taskItem.Description}</p>
+
                   </div>
+
                 ))
-              } */}
+              }
+
+              <div className={styles.newTask}>
+
+                <form className={styles.newTaskForm} onSubmit={newTaskHandler}>
+
+                  <textarea name="title" placeholder="Title"/>
+                  <textarea name="description" placeholder="Description"/>
+                  <input className={styles.button} type="submit" value="Create New Task" />
+
+                </form>
+
+              </div>
 
       </div>
       

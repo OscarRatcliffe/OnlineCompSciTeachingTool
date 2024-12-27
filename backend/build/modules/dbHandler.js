@@ -124,7 +124,7 @@ async function authCheck(sessionID) {
 }
 //Get task list
 async function getTaskList(classID) {
-    let taskList = await client.query(`SELECT id, title, deadline FROM task WHERE class='${classID}'`);
+    let taskList = await client.query(`SELECT id, title, deadline, description FROM task WHERE class='${classID}'`);
     // Return null if no tasks found
     if (taskList.rowCount == 0) {
         return null;
@@ -136,10 +136,14 @@ async function getTaskList(classID) {
                 "ID": taskList.rows[i].id,
                 "Title": taskList.rows[i].title,
                 "Deadline": taskList.rows[i].deadline,
+                "Description": taskList.rows[i].description
             });
         }
         return tasks;
     }
+}
+async function createNewTask(title, description, classID) {
+    await client.query(`INSERT INTO task (title, description, class) VALUES ('${title}', '${description}', '${classID}')`);
 }
 //Teacher Signup
 async function teacherSignup(username, password) {
@@ -165,4 +169,4 @@ async function teacherSignup(username, password) {
         }
     }
 }
-export { authCheck, login, teacherSignup, getTaskList };
+export { authCheck, login, teacherSignup, getTaskList, createNewTask };

@@ -14,7 +14,8 @@ type classFormat = {
 type taskListFormat = {
     "ID": number,
     "Title": string,
-    "Deadline": number
+    "Deadline": number,
+    "Description": string
 }
 
 type authCheckFormat = {

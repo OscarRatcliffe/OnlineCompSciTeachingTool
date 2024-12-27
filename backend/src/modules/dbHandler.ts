@@ -193,7 +193,7 @@ async function authCheck(sessionID:string): Promise<authCheckFormat | null> { //
 //Get task list
 async function getTaskList(classID:number): Promise<Array<taskListFormat> | null> {
 
-    let taskList = await client.query(`SELECT id, title, deadline FROM task WHERE class='${classID}'`)
+    let taskList = await client.query(`SELECT id, title, deadline, description FROM task WHERE class='${classID}'`)
 
     // Return null if no tasks found
     if(taskList.rowCount as number == 0) {
@@ -210,6 +210,7 @@ async function getTaskList(classID:number): Promise<Array<taskListFormat> | null
                 "ID": taskList.rows[i].id,
                 "Title": taskList.rows[i].title,
                 "Deadline": taskList.rows[i].deadline,
+                "Description": taskList.rows[i].description
             })
 
         }
@@ -217,6 +218,12 @@ async function getTaskList(classID:number): Promise<Array<taskListFormat> | null
         return tasks
 
     }
+
+}
+
+async function createNewTask(title: string, description: string, classID: number) {
+
+    await client.query(`INSERT INTO task (title, description, class) VALUES ('${title}', '${description}', '${classID}')`)
 
 }
 
@@ -254,4 +261,4 @@ async function teacherSignup(username:string, password:string): Promise<number> 
     }
 }
 
-export {authCheck, login, teacherSignup, getTaskList};
+export {authCheck, login, teacherSignup, getTaskList, createNewTask};

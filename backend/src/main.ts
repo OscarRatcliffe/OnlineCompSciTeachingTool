@@ -9,8 +9,9 @@ import cors from 'cors';
 app.use(cors());
 
 // Custom libraries
-import { authCheck, login, teacherSignup, getTaskList } from "./modules/dbHandler.js";
+import { authCheck, login, teacherSignup, getTaskList, createNewTask } from "./modules/dbHandler.js";
 import spawnContainer from "./modules/spawner.js";
+import { title } from 'process';
 
 // Get test script
 const pythonScript = fs.readFileSync('test.py', 'utf8');
@@ -147,6 +148,31 @@ app.get('/getTaskList', async (req:any, res:any) => {
     }
 
     if (!validAuth) {
+
+        res.sendStatus(403)
+
+    }
+
+})
+
+app.get('/createNewTask', async (req:any, res:any) => {
+
+    const reqData = {
+        "title": req.headers.title,
+        "description": req.headers.description,
+        "classID": req.headers.classid,
+        "sessionID": req.headers.sessionid
+    }
+
+    console.log(reqData)
+
+    let checkAuth: authCheckFormat | null = await authCheck(reqData.sessionID) 
+
+    if (checkAuth != null) {
+
+        createNewTask(reqData.title, reqData.description, reqData.classID)
+
+    } else {
 
         res.sendStatus(403)
 
