@@ -10,9 +10,7 @@ export default function ErrorMsg(props: any) { //Pass in values from calling pag
     const msgBox = msgBoxRef.current as HTMLDivElement; //Set the msgBox object to control the div element
 
     console.log("Error message loaded")
-
-    msgBox.style.opacity = '1';
-
+    
     const timer = setTimeout(() => { //Wait before fade out
 
       msgBox.style.opacity = '0'; // Fade out
