@@ -20,12 +20,11 @@
 - TS create API endpoint
 - Creating frontend
 - Login / sessionID function
-- Auth check func
-- CORS and other middleware - Issue when first runnings
-- Frontend login page
 - Error messages
+- Auth check func / Checking session ID on home page
+- CORS and other middleware - Issue when first runnings
 - Sign up page / backend
-- Main page
+- Main page teacher
     - Cookie check
     - Auth check
     - Get classes list
@@ -33,11 +32,11 @@
     - Switch between classes
     - Get task list
         - View tasks
-    
-- Main page teacher 
-    - Create class
-        - Set taks 
+        - Create tasks
     - Create students
+    - Create classes
+    
+- Main page student
 
 - Create container initial attempt - Talk about challenges
 
