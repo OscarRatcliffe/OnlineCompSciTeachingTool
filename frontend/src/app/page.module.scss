@@ -1,6 +1,6 @@
 .main {
   display: grid;
-  grid-template-columns: 20% 1fr;
+  grid-template-columns: minmax(5em, 15em) 1fr;
   grid-template-rows: 3em 1fr; 
   text-align: center;
   min-height: 100vh;
@@ -112,7 +112,7 @@
       margin-right: auto;
       
       margin-top: 2em;
-      width: 80%;
+      max-width: 50em;
 
       padding: 1em;
 
@@ -143,7 +143,7 @@
         margin-right: auto;
         
         margin-top: 2em;
-        width: 80%;
+        max-width: 50em;
 
         padding: 1em;
 
@@ -236,7 +236,7 @@
 
   }
 
-  .newStudentFormBG {
+  .formBG {
 
     position: fixed;
     top: 0;
@@ -249,13 +249,13 @@
     align-items: center;
     z-index: 1000;
 
-    .newStudentForm {
+    .form {
 
       display: block;
       padding: 5em;
 
-      width: 80%;
-      height: 40%;
+      width: 30em;
+      height: 30em;
 
       background-color: #1F1E25;
       border-radius: 1em;

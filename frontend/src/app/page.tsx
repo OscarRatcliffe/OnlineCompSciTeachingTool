@@ -26,6 +26,8 @@ export default function Home() {
 
   const [createNewUserVisable, setCreateNewUserVisable] = useState(false);
 
+  const [createNewClassVisable, setCreateNewClassVisable] = useState(false);
+
   const [isTeacher, setIsTeacher] = useState(true); 
 
   const [currentClass, setCurrentClass] = useState(-1);
@@ -389,7 +391,6 @@ export default function Home() {
 
               <div className={styles.newStudent}> 
 
-
                 <button onClick={newStudentHandler}>Add Student</button>
 
               </div>
@@ -398,13 +399,13 @@ export default function Home() {
 
       {createNewUserVisable && (
         
-      <div className={styles.newStudentFormBG}>
+      <div className={styles.formBG}>
       
-          <div className={styles.newStudentForm}>
+          <div className={styles.form}>
           
                   <h2>NEW STUDENT</h2>
 
-                  <form className={styles.newTaskForm} onSubmit={newStudentCreationHandler}>
+                  <form onSubmit={newStudentCreationHandler}>
 
                     <input type="text" name="username" placeholder="Username"/>
                     <input type="password"name="password" placeholder="Password"/>
@@ -417,6 +418,27 @@ export default function Home() {
 
       </div>
 
+      )}
+
+      {createNewClassVisable && (
+        
+        <div className={styles.formBG}>
+        
+            <div className={styles.form}>
+            
+                    <h2>NEW CLASS</h2>
+  
+                    <form onSubmit={newStudentCreationHandler}> 
+  
+                      <input type="text" name="name" placeholder="Class Name"/>
+                      <input className={styles.button} type="submit" value="Create Class" />
+  
+                    </form>
+  
+            </div>
+  
+        </div>
+  
       )}
       
     </div>
