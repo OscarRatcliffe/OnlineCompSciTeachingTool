@@ -26,9 +26,8 @@
 - CORS and other middleware - Issue when first runnings
 - Sign up page / backend
 - Main page teacher
-    - Cookie check
-    - Auth check
     - Get classes list
+        - Part of auth check func (Not yet written about)
     - Dynamically list classes
     - Switch between classes
     - Get task list
