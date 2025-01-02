@@ -30,6 +30,7 @@
         - Part of auth check func (Not yet written about)
     - Dynamically list classes
     - Switch between classes
+    - Log out
     - Get task list
         - View tasks
         - Create tasks
