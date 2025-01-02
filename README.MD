@@ -38,6 +38,8 @@
     - Create classes
     
 - Main page student
+    - Update backend auth check function
+    - Adapted view
 
 - Create container initial attempt - Talk about challenges
 
