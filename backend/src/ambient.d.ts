@@ -20,5 +20,6 @@ type taskListFormat = {
 
 type authCheckFormat = {
     "userType": userGroup,
-    "classes": Array<classFormat> 
+    "classes": Array<classFormat>,
+    "userID": number
 } 

@@ -127,7 +127,7 @@ async function authCheck(sessionID:string): Promise<authCheckFormat | null> { //
     let classes: Array<classFormat> = []
     let validAuth:boolean = true;
 
-    let sessionRes = await client.query(`SELECT class, session_expires FROM student WHERE last_session_id='${sessionID}'`) //Get password field for student
+    let sessionRes = await client.query(`SELECT class, session_expires, ID FROM student WHERE last_session_id='${sessionID}'`) //Get password field for student
     
     let userType: userGroup = "Student"
 
@@ -174,15 +174,14 @@ async function authCheck(sessionID:string): Promise<authCheckFormat | null> { //
 
         }
 
-    
-
     }
 
     if (validAuth) {
 
         return {
             "userType": userType,
-            "classes": classes
+            "classes": classes,
+            "userID": sessionRes.rows[0].ID //Added for create classes func 
         }
 
     }
@@ -296,4 +295,12 @@ async function studentSignup(username:string, password:string, classID:number): 
     
 }
 
-export {authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup};
+//Create class
+async function createClass(className:string, teacherID: number): Promise<number> {
+
+    await client.query(`INSERT INTO class (name,teacher) VALUES ('${className}','${teacherID}')`)  
+
+    return StatusCodes.CREATED
+}
+
+export {authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup, createClass};

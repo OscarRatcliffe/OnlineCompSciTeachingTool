@@ -207,7 +207,7 @@ export default function Home() {
       setCreateNewUserVisable(true)
     }
 
-    async function newStudentCreationHandler(event: any) {
+  async function newStudentCreationHandler(event: any) {
 
     event.preventDefault(); //Stops deafult form behavior
     const formData = new FormData(event.currentTarget); 
@@ -267,6 +267,47 @@ export default function Home() {
     }
     }
 
+    async function newClassCreationHandler(event: any) {
+
+      event.preventDefault(); //Stops deafult form behavior
+      const formData = new FormData(event.currentTarget); 
+  
+      const className = formData.get('name') as FormDataEntryValue;
+  
+        // Get request to backend
+        await axios.get("http://localhost:3000/createClass", {
+          headers: {
+            'classname': className.toString(),
+            'sessionid': sessionID,
+          }
+  
+        }).catch(function(error) { //Error handling
+  
+          switch(error.response.status) { //Switch instead of if to make adding codes easier down the line
+  
+              case 403:
+                setErrorText("Permissions error")
+                break;
+  
+            case 500:
+  
+              setErrorText("Internal server error")
+              break;
+              
+  
+            default:
+  
+              setErrorText(`Unexpected error - ${error.response.status}`)
+  
+          }
+  
+          setErrorVisible(true) //Show error message
+  
+        })
+  
+        setCreateNewUserVisable(false)
+      }
+    
 
   useEffect(() => { //On page load
 
@@ -428,7 +469,7 @@ export default function Home() {
             
                     <h2>NEW CLASS</h2>
   
-                    <form onSubmit={newStudentCreationHandler}> 
+                    <form onSubmit={newClassCreationHandler}> 
   
                       <input type="text" name="name" placeholder="Class Name"/>
                       <input className={styles.button} type="submit" value="Create Class" />

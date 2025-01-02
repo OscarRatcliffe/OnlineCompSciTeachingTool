@@ -9,7 +9,7 @@ import cors from 'cors';
 app.use(cors());
 
 // Custom libraries
-import { authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup } from "./modules/dbHandler.js";
+import { authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup, createClass } from "./modules/dbHandler.js";
 import spawnContainer from "./modules/spawner.js";
 import { title } from 'process';
 
@@ -108,6 +108,30 @@ app.get('/teacherSignUp', async (req:any, res:any) => {
 
     const loginCheckRes = await teacherSignup(reqData.Username.toLowerCase(), reqData.Password) //Check if username and password is correct
     res.sendStatus(loginCheckRes)
+
+})
+
+//Teacher sign up
+app.get('/createClass', async (req:any, res:any) => {
+ 
+    // Get post request data
+    const reqData = {
+        "className": req.headers.classname,
+        "sessionID": req.headers.sessionid
+    }
+
+    let checkAuth: authCheckFormat | null = await authCheck(reqData.sessionID) 
+
+    if(checkAuth != null) {
+
+        createClass(reqData.className, checkAuth.userID)
+        res.status(201) //Created
+
+    } else {
+
+        res.sendStatus(403)
+
+    }
 
 })
 

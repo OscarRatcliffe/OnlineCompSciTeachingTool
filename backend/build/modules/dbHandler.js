@@ -81,7 +81,7 @@ async function login(username, password) {
 async function authCheck(sessionID) {
     let classes = [];
     let validAuth = true;
-    let sessionRes = await client.query(`SELECT class, session_expires FROM student WHERE last_session_id='${sessionID}'`); //Get password field for student
+    let sessionRes = await client.query(`SELECT class, session_expires, ID FROM student WHERE last_session_id='${sessionID}'`); //Get password field for student
     let userType = "Student";
     if (sessionRes.rowCount == 0) { //If cant find student check teachers
         sessionRes = await client.query(`SELECT ID, session_expires FROM teacher WHERE last_session_id='${sessionID}'`); //Get password field for teacher
@@ -117,7 +117,8 @@ async function authCheck(sessionID) {
     if (validAuth) {
         return {
             "userType": userType,
-            "classes": classes
+            "classes": classes,
+            "userID": sessionRes.rows[0].ID //Added for create classes func 
         };
     }
     return null;
@@ -193,4 +194,9 @@ async function studentSignup(username, password, classID) {
         }
     }
 }
-export { authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup };
+//Create class
+async function createClass(className, teacherID) {
+    await client.query(`INSERT INTO class (name,teacher) VALUES ('${className}','${teacherID}')`);
+    return StatusCodes.CREATED;
+}
+export { authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup, createClass };

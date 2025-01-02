@@ -6,7 +6,7 @@ const app = express();
 import cors from 'cors';
 app.use(cors());
 // Custom libraries
-import { authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup } from "./modules/dbHandler.js";
+import { authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup, createClass } from "./modules/dbHandler.js";
 import spawnContainer from "./modules/spawner.js";
 // Get test script
 const pythonScript = fs.readFileSync('test.py', 'utf8');
@@ -71,6 +71,22 @@ app.get('/teacherSignUp', async (req, res) => {
     };
     const loginCheckRes = await teacherSignup(reqData.Username.toLowerCase(), reqData.Password); //Check if username and password is correct
     res.sendStatus(loginCheckRes);
+});
+//Teacher sign up
+app.get('/createClass', async (req, res) => {
+    // Get post request data
+    const reqData = {
+        "className": req.headers.classname,
+        "sessionID": req.headers.sessionid
+    };
+    let checkAuth = await authCheck(reqData.sessionID);
+    if (checkAuth != null) {
+        createClass(reqData.className, checkAuth.userID);
+        res.status(201); //Created
+    }
+    else {
+        res.sendStatus(403);
+    }
 });
 //Student sign up
 app.get('/studentSignUp', async (req, res) => {
