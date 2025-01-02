@@ -318,6 +318,13 @@ export default function Home() {
         setCreateNewUserVisable(false)
         
       }
+
+      async function logOut() {
+
+        document.cookie = "sessionID=; Max-Age=0"
+        window.location.href = "/login"
+
+      }
     
 
   useEffect(() => { //On page load
@@ -445,6 +452,12 @@ export default function Home() {
               <div className={styles.newStudent}> 
 
                 <button onClick={newStudentHandler}>Add Student</button>
+
+              </div>
+
+              <div className={styles.logOut}> 
+
+                <button onClick={logOut}>LogOut</button>
 
               </div>
 
