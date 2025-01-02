@@ -80,6 +80,7 @@ app.get('/createClass', async (req, res) => {
         "sessionID": req.headers.sessionid
     };
     let checkAuth = await authCheck(reqData.sessionID);
+    console.log(checkAuth);
     if (checkAuth != null) {
         createClass(reqData.className, checkAuth.userID);
         res.status(201); //Created

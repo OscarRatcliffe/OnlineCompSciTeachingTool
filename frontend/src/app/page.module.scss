@@ -42,6 +42,26 @@
       color: white;
     }
 
+      button {
+        margin-top: 1.5em;
+        font-size: 1.3em;
+        color: #97979a;
+
+        background: 0;
+        border: 0;
+
+      }
+
+      button:hover {
+        color: #c3c3c5;
+      }
+      
+      button:active {
+        color: #c3c3c5;
+      }
+
+
+
     .Item {
   
       width: 70%;

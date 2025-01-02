@@ -207,6 +207,10 @@ export default function Home() {
       setCreateNewUserVisable(true)
     }
 
+    function newClassHandler() {
+      setCreateNewClassVisable(true)
+    }
+
   async function newStudentCreationHandler(event: any) {
 
     event.preventDefault(); //Stops deafult form behavior
@@ -307,6 +311,13 @@ export default function Home() {
   
         setCreateNewUserVisable(false)
       }
+
+      async function closePopups() {
+
+        setCreateNewClassVisable(false)
+        setCreateNewUserVisable(false)
+        
+      }
     
 
   useEffect(() => { //On page load
@@ -391,6 +402,7 @@ export default function Home() {
               </div>
             ))
           }
+          <button onClick={newClassHandler}>Add Class</button>
       </div>
 
       <div className={styles.mainPage} key={currentClass}>
@@ -452,6 +464,7 @@ export default function Home() {
                     <input type="password"name="password" placeholder="Password"/>
                     <input type="password"name="passwordCheck" placeholder="Password Check"/>
                     <input className={styles.button} type="submit" value="Create User" />
+                    <input className={styles.button} type="button" onClick={closePopups} value="Close" />
 
                   </form>
 
@@ -473,6 +486,7 @@ export default function Home() {
   
                       <input type="text" name="name" placeholder="Class Name"/>
                       <input className={styles.button} type="submit" value="Create Class" />
+                      <input className={styles.button} type="button" onClick={closePopups} value="Close" />
   
                     </form>
   

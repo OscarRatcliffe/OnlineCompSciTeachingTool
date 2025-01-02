@@ -81,11 +81,12 @@ async function login(username, password) {
 async function authCheck(sessionID) {
     let classes = [];
     let validAuth = true;
-    let sessionRes = await client.query(`SELECT class, session_expires, ID FROM student WHERE last_session_id='${sessionID}'`); //Get password field for student
+    let sessionRes = await client.query(`SELECT class, session_expires, id FROM student WHERE last_session_id='${sessionID}'`); //Get password field for student
     let userType = "Student";
     if (sessionRes.rowCount == 0) { //If cant find student check teachers
-        sessionRes = await client.query(`SELECT ID, session_expires FROM teacher WHERE last_session_id='${sessionID}'`); //Get password field for teacher
+        sessionRes = await client.query(`SELECT id, session_expires FROM teacher WHERE last_session_id='${sessionID}'`); //Get password field for teacher
         userType = "Teacher";
+        console.log(sessionRes);
     }
     // Custom error handling
     if (typeof (sessionRes.rowCount) == null) {
@@ -118,7 +119,7 @@ async function authCheck(sessionID) {
         return {
             "userType": userType,
             "classes": classes,
-            "userID": sessionRes.rows[0].ID //Added for create classes func 
+            "userID": sessionRes.rows[0].id //Added for create classes func 
         };
     }
     return null;

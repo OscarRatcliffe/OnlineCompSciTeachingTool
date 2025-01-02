@@ -122,6 +122,8 @@ app.get('/createClass', async (req:any, res:any) => {
 
     let checkAuth: authCheckFormat | null = await authCheck(reqData.sessionID) 
 
+    console.log(checkAuth)
+
     if(checkAuth != null) {
 
         createClass(reqData.className, checkAuth.userID)

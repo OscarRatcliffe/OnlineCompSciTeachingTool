@@ -127,14 +127,16 @@ async function authCheck(sessionID:string): Promise<authCheckFormat | null> { //
     let classes: Array<classFormat> = []
     let validAuth:boolean = true;
 
-    let sessionRes = await client.query(`SELECT class, session_expires, ID FROM student WHERE last_session_id='${sessionID}'`) //Get password field for student
+    let sessionRes = await client.query(`SELECT class, session_expires, id FROM student WHERE last_session_id='${sessionID}'`) //Get password field for student
     
     let userType: userGroup = "Student"
 
     if (sessionRes.rowCount == 0) { //If cant find student check teachers
 
-        sessionRes = await client.query(`SELECT ID, session_expires FROM teacher WHERE last_session_id='${sessionID}'`) //Get password field for teacher
+        sessionRes = await client.query(`SELECT id, session_expires FROM teacher WHERE last_session_id='${sessionID}'`) //Get password field for teacher
         userType = "Teacher"
+
+        console.log(sessionRes)
 
     }
 
@@ -181,7 +183,7 @@ async function authCheck(sessionID:string): Promise<authCheckFormat | null> { //
         return {
             "userType": userType,
             "classes": classes,
-            "userID": sessionRes.rows[0].ID //Added for create classes func 
+            "userID": sessionRes.rows[0].id //Added for create classes func 
         }
 
     }
@@ -195,7 +197,7 @@ async function getTaskList(classID:number): Promise<Array<taskListFormat> | null
     let taskList = await client.query(`SELECT id, title, deadline, description FROM task WHERE class='${classID}'`)
 
     // Return null if no tasks found
-    if(taskList.rowCount as number == 0) {
+    if(taskList.rowCount as number == 0) {  
 
         return null
 
