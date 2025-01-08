@@ -1,0 +1,134 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.3 Chrome/130.0.6723.137 Electron/33.2.1 Safari/537.36" version="26.0.3">
+  <diagram name="Page-1" id="-5gEFGp6vmCek2D7KFQH">
+    <mxGraphModel dx="1578" dy="1143" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-8" value="SQL" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tui0RTwlK1HxYO_e-Waz-2" target="tui0RTwlK1HxYO_e-Waz-6">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-2" value="Backend hashes&lt;div&gt;password&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="230" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-5" value="API" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tui0RTwlK1HxYO_e-Waz-4" target="tui0RTwlK1HxYO_e-Waz-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-4" value="Teacher sign up page" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="120" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-6" value="User data stored in DB" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="340" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-18" value="SQL" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tui0RTwlK1HxYO_e-Waz-13" target="tui0RTwlK1HxYO_e-Waz-16">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="575" y="310" />
+              <mxPoint x="575" y="310" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-19" value="API response" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tui0RTwlK1HxYO_e-Waz-13" target="tui0RTwlK1HxYO_e-Waz-17">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="655" y="310" />
+              <mxPoint x="655" y="310" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-13" value="Backend creates session ID" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="540" y="230" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-14" value="API" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tui0RTwlK1HxYO_e-Waz-15" target="tui0RTwlK1HxYO_e-Waz-13">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-15" value="Teacher log in page" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="530" y="120" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-16" value="SessionID stored in DB" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="540" y="340" width="70" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-17" value="Login cookie set + Redirect to main page" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="620" y="340" width="70" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-27" value="SQL" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tui0RTwlK1HxYO_e-Waz-28" target="tui0RTwlK1HxYO_e-Waz-31">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-28" value="Backend interim" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="730" y="230" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-29" value="API" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tui0RTwlK1HxYO_e-Waz-30" target="tui0RTwlK1HxYO_e-Waz-28">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-30" value="Teacher creates&lt;div&gt;class / task&lt;/div&gt;" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="720" y="120" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-31" value="Item created in DB" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="730" y="340" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-34" value="Pop up from class page" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tui0RTwlK1HxYO_e-Waz-35">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="235" y="229.9999999999999" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-35" value="Student sign up page" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="120" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-38" value="API" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="tui0RTwlK1HxYO_e-Waz-37" target="tui0RTwlK1HxYO_e-Waz-2">
+          <mxGeometry x="0.3334" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-37" value="Enter student&lt;div&gt;Username / Password&lt;/div&gt;" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="230" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-50" value="File System" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tui0RTwlK1HxYO_e-Waz-45" target="tui0RTwlK1HxYO_e-Waz-49">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1025" y="320" />
+              <mxPoint x="1025" y="320" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-51" value="SQL" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tui0RTwlK1HxYO_e-Waz-45" target="tui0RTwlK1HxYO_e-Waz-48">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="945" y="300" />
+              <mxPoint x="945" y="300" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-45" value="Backend creates&lt;div&gt;container template&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="910" y="230" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-46" value="API" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tui0RTwlK1HxYO_e-Waz-47" target="tui0RTwlK1HxYO_e-Waz-45">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-47" value="Teacher adds starting&lt;div&gt;code to task&lt;/div&gt;" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="900" y="120" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-48" value="Task updated in DB" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="910" y="340" width="70" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tui0RTwlK1HxYO_e-Waz-49" value="Dockerfile created in backend" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="990" y="340" width="70" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
