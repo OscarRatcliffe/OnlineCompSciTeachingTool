@@ -23,20 +23,20 @@
 - Error messages
 - Auth check func / Checking session ID on home page
 - CORS and other middleware - Issue when first runnings
-
 - Sign up page / backend
 - Main page teacher
     - Get classes list
         - Part of auth check func (Not yet written about)
     - Dynamically list classes
     - Switch between classes
-    - Log out
     - Get task list
         - View tasks
+
         - Create tasks
     - Create students
     - Create classes
         - Modified check auth func again
+    - Log out
     
 - Main page student
     - Update backend auth check function
