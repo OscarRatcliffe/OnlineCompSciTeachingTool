@@ -1,9 +1,7 @@
 # TODO
 - Student dashboard
     - Fetch task list
-- Teacher dashboard
-    - Create classes
-- Student open tasks
+    - Open tasks
 - Online code editor
 - Remote running
 - Interactive terminal
