@@ -326,4 +326,37 @@ async function createClass(className:string, teacherID: number): Promise<number>
     return StatusCodes.CREATED
 }
 
-export {authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup, createClass};
+async function newCodeSave(taskID: number, studentID: number, code: string) {
+
+    //Check if already exists
+    let sessionRes = await client.query(`SELECT id FROM solutions WHERE task='${taskID}' AND student='${studentID}'`)
+
+    if(sessionRes.rowCount as number > 0) { //Found in DB
+
+        await client.query(`UPDATE solutions SET task='${taskID}', student='${studentID}', code='${code}' WHERE ID=${sessionRes.rows[0].id}`)
+
+    } else {
+
+        await client.query(`INSERT INTO solutions (task, student, code) VALUES ('${taskID}', '${studentID}', '${code}')`)
+    }
+
+}
+
+async function getCode(taskID: number, studentID: number) {
+
+
+    try {
+
+        let sessionRes = await client.query(`SELECT code FROM solutions WHERE task='${taskID}' AND student='${studentID}'`)
+        return sessionRes.rows[0].code
+
+    } catch {
+
+        return null
+
+    }
+    
+
+}
+
+export {authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup, createClass, newCodeSave, getCode};

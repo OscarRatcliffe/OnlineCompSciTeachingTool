@@ -38,12 +38,12 @@
 - Main page student
     - Adapted view
     - Updated authcheck func to handler teacher classes and student classes differently (OUTER JOIN SQL)
-
 - Code editor
 - Create container initial attempt - Talk about challenges
 - Running code in containers
 - Linking the 2
 - Multi line support
+
 - Saving code
 
 # Prototype stages

@@ -29,7 +29,10 @@ export default function Home() {
 
   const [createNewClassVisable, setCreateNewClassVisable] = useState(false);
 
+  const [currentTask, setCurrentTask] = useState(-1);
+
   const [codeEditorVisible, setCodeEditorVisible] = useState(false);
+  const [codeEditorContent, setCodeEditorContent] = useState("");
   const [terminalResponse, setTerminalResponse] = useState("Run your code to get an output!");
 
   const [isTeacher, setIsTeacher] = useState(true); 
@@ -215,8 +218,52 @@ export default function Home() {
       setCreateNewClassVisable(true)
     }
 
-    function codeEditorHandler() {
+    async function codeEditorHandler(taskID: any) {
+      
+      console.log(taskID)
+
+      setCurrentTask(taskID)
       setCodeEditorVisible(true)
+
+      await axios.get("http://localhost:3000/getCode", {
+        headers: {
+          "taskid": currentTask,
+          'sessionid': sessionID,
+        }
+
+      }).then(function(response) {
+
+        setCodeEditorContent(base64.decode(response.data.code))
+
+    }).catch(function(error) { //Error handling
+
+        switch(error.response.status) { //Switch instead of if to make adding codes easier down the line
+
+            case 404:
+                //Ignore
+                break;
+
+            case 403:
+              setErrorText("Permissions error")
+              break;
+
+          case 500:
+
+            setErrorText("Internal server error")
+            break;
+            
+
+          default:
+
+            setErrorText(`Unexpected error - ${error.response.status}`)
+
+        }
+
+        setErrorVisible(true) //Show error message
+
+      })
+
+      setCreateNewUserVisable(false)
     }
 
   async function newStudentCreationHandler(event: any) {
@@ -328,12 +375,14 @@ export default function Home() {
         const code = formData.get('code') as FormDataEntryValue;
 
         console.log(code.toString())
+        console.log(currentTask)
     
           // Get request to backend
           await axios.get("http://localhost:3000/runCode", {
             headers: {
-              'code': base64.encode(code.toString()), //Base 64 encoding used to allow for multi-line
-              'sessionid': sessionID,
+              "taskid": currentTask,
+              "code": base64.encode(code.toString()), //Base 64 encoding used to allow for multi-line
+              "sessionid": sessionID
             }
     
           }).then(function(response) {
@@ -616,7 +665,7 @@ export default function Home() {
 
                   <h3>{taskItem.Title}</h3>
                   <p>{taskItem.Description}</p>
-                  <button onClick={codeEditorHandler}>Code editor</button>
+                  <button onClick={() => codeEditorHandler(taskItem.ID)}>Code editor</button>
                 </div>
 
               ))
@@ -640,7 +689,7 @@ export default function Home() {
   
                     <form onSubmit={codeRunHandler}> 
   
-                      <textarea name="code" placeholder="Code"/>
+                      <textarea name="code" placeholder={codeEditorContent}/>
                       <div>{terminalResponse}</div>
                       <input className={styles.button} type="submit" value="Run" />
                       <input className={styles.button} type="button" onClick={closePopups} value="Close" />

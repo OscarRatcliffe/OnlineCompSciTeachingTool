@@ -8,7 +8,7 @@ const app = express();
 import cors from 'cors';
 app.use(cors());
 // Custom libraries
-import { authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup, createClass } from "./modules/dbHandler.js";
+import { authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup, createClass, newCodeSave, getCode } from "./modules/dbHandler.js";
 // Get test script
 const pythonScript = fs.readFileSync('test.py', 'utf8');
 //Login script
@@ -156,13 +156,16 @@ app.get('/AuthCheck', async (req, res) => {
 var currentContainerIDs = [];
 app.get('/runCode', async (req, res) => {
     const reqData = {
+        "taskID": req.headers.taskid,
         "code": req.headers.code,
         "sessionID": req.headers.sessionid
     };
+    console.log(reqData);
     let code = base64.decode(reqData.code);
     console.log(code);
     let checkAuth = await authCheck(reqData.sessionID);
     if (checkAuth != null) {
+        newCodeSave(reqData.taskID, checkAuth.userID, reqData.code); //Stored in base64 to maintain lines
         try {
             let createdValidID = false;
             let containerID = 0;
@@ -192,6 +195,7 @@ app.get('/runCode', async (req, res) => {
                 // Delete container once code has run
                 await container.remove();
                 currentContainerIDs = currentContainerIDs.filter((item) => item !== containerID); //Remove ID from current running containers
+                res.status(201); //Created
                 res.send({
                     "State": `Created container ${containerID}`,
                     "terminalRes": `${logs.toString()}`
@@ -203,6 +207,30 @@ app.get('/runCode', async (req, res) => {
         }
     }
     else {
+        res.sendStatus(403);
+    }
+});
+//Get task list
+app.get('/getCode', async (req, res) => {
+    // Get post request data
+    const reqData = {
+        "taskID": req.headers.taskid,
+        "sessionID": req.headers.sessionid
+    };
+    let checkAuth = await authCheck(reqData.sessionID);
+    console.log("Auth result: " + await checkAuth);
+    let validAuth = false;
+    if (checkAuth != null) {
+        let code = getCode(reqData.taskID, checkAuth.userID);
+        if (code == null) {
+            res.sendStatus(404); //No previous solution found
+        }
+        else {
+            res.status(200);
+            res.send(code);
+        }
+    }
+    if (!validAuth) {
         res.sendStatus(403);
     }
 });
