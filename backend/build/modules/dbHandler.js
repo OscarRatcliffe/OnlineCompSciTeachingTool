@@ -83,7 +83,7 @@ async function authCheck(sessionID) {
     let validAuth = true;
     let sessionRes = await client.query(`SELECT class, session_expires, id FROM student WHERE last_session_id='${sessionID}'`); //Get password field for student
     let userType = "Student";
-    try {
+    try { //Used so that if a class cannot be found the program does not crash
         const studentClassesRes = await client.query(`SELECT class.id, class.name FROM class FULL OUTER JOIN student ON class.id = student.class WHERE student.id ='${sessionRes.rows[0].id}'`);
         classes.push({
             "ID": studentClassesRes.rows[0].id,

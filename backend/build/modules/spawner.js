@@ -7,36 +7,19 @@ function spawnContainer(code, containerID, currentContainerIDs) {
         AttachStdout: true,
         AttachStderr: true,
         AttachStdin: true,
-        Tty: true,
-        OpenStdin: true,
         name: containerID.toString(),
         Cmd: ['python', '-c', code]
-    }, function (err, container) {
-        if (err) {
-            console.error(err);
-            return;
-        }
+    }, async function (err, container) {
         // Run container
-        container.start(function (err, data) {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            container.wait(function (err) {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-                // Delete container once code has run
-                container.remove(function (err) {
-                    if (err) {
-                        console.error(err);
-                        currentContainerIDs = currentContainerIDs.filter((item) => item !== containerID); //Remove ID from current running containers
-                        return;
-                    }
-                });
-            });
-        });
+        await container.start();
+        // Wait for container to finish running
+        await container.wait();
+        //Record container output
+        const logs = await container.logs({ stdout: true, stderr: true });
+        return logs.toString();
+        // Delete container once code has run
+        await container.remove();
+        currentContainerIDs = currentContainerIDs.filter((item) => item !== containerID); //Remove ID from current running containers
     });
 }
 export default spawnContainer;

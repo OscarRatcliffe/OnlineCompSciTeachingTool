@@ -337,7 +337,7 @@ export default function Home() {
 
             console.log(response.data)
 
-            setTerminalResponse("Code run")
+            setTerminalResponse(response.data.terminalRes)
     
         }).catch(function(error) { //Error handling
     
@@ -380,17 +380,6 @@ export default function Home() {
         window.location.href = "/login"
 
       }
-
-      // async function codeWritingHandler (event: any) {
-
-      //   event.preventDefault(); //Stops deafult form behavior
-      //   const formData = new FormData(event.currentTarget); 
-    
-      //   const className = formData.get('name') as FormDataEntryValue;
-    
-
-    
-      // }
   
     
 

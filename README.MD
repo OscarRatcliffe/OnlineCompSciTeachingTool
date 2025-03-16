@@ -41,9 +41,9 @@
 
 - Code editor
 - Create container initial attempt - Talk about challenges
-
 - Running code in containers
 - Linking the 2
+- Multi line support
 
 # Prototype stages
 - Teacher login, create class, create students, create task

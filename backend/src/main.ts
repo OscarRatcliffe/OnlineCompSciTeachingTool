@@ -1,6 +1,8 @@
 // Librarys
 import fs from 'fs';
 import express from 'express'
+import Docker from 'dockerode';
+import { spawn } from 'child_process';
 
 const app = express()
 
@@ -10,54 +12,10 @@ app.use(cors());
 
 // Custom libraries
 import { authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup, createClass } from "./modules/dbHandler.js";
-import spawnContainer from "./modules/spawner.js";
 import { title } from 'process';
 
 // Get test script
 const pythonScript = fs.readFileSync('test.py', 'utf8');
-
-// Create containers
-var currentContainerIDs: any = []
-app.get('/testCreation', async (req: any, res:any) => { 
-
-    if(await authCheck(req.query.session) != null) {
-
-        try {
-
-            let createdValidID = false
-            let containerID: number = 0 
-        
-            while (!createdValidID) { //Loop until unique ID is created
-        
-                containerID = Math.floor(Math.random() * 999) + 8000;
-        
-                if (!currentContainerIDs.includes(containerID)) {
-                    createdValidID = true
-                    currentContainerIDs.push(containerID)
-                }
-            }
-        
-            console.log(containerID)
-        
-            res.send({
-                "State": `Created container ${containerID}`
-            })
-            
-            spawnContainer(pythonScript, containerID, currentContainerIDs)
-    
-        } catch {
-    
-            res.sendStatus(500)
-    
-        }
-
-    } else {
-
-        res.sendStatus(403)
-
-    }
-
-})
 
 //Login script
 app.get('/login', async (req:any, res:any) => {
@@ -278,6 +236,82 @@ app.get('/AuthCheck', async (req:any, res:any) => {
     }
 
 })
+
+var currentContainerIDs: any = []
+app.get('/runCode', async (req:any, res:any) => {
+
+    const reqData = {
+        "code": req.headers.code,
+        "sessionID": req.headers.sessionid
+    }
+
+    let checkAuth: authCheckFormat | null = await authCheck(reqData.sessionID) 
+
+    if (checkAuth != null) {
+
+        try {
+
+            let createdValidID = false
+            let containerID: number = 0 
+        
+            while (!createdValidID) { //Loop until unique ID is created
+        
+                containerID = Math.floor(Math.random() * 999) + 8000;
+        
+                if (!currentContainerIDs.includes(containerID)) {
+                    createdValidID = true
+                    currentContainerIDs.push(containerID)
+                }
+            }
+        
+            console.log(containerID)
+        
+            const docker = new Docker();
+
+            docker.createContainer({
+                Image: 'python',
+                AttachStdout: true,
+                AttachStderr: true,
+                AttachStdin: true,
+                name: containerID.toString(),
+                Cmd: ['python', '-c', reqData.code]
+
+            }, async function(err: any, container: any) {
+
+                // Run container
+                await container.start();
+
+                // Wait for container to finish running
+                await container.wait();
+
+                //Record container output
+                const logs = await container.logs({ stdout: true, stderr: true });
+
+                // Delete container once code has run
+                await container.remove();
+                currentContainerIDs = currentContainerIDs.filter((item: number )=> item !== containerID); //Remove ID from current running containers
+
+                res.send({
+                    "State": `Created container ${containerID}`,
+                    "terminalRes": `${logs.toString()}`
+                })
+
+            });
+    
+        } catch {
+    
+            res.sendStatus(500)
+    
+        }
+
+    } else {
+
+        res.sendStatus(403)
+
+    }
+
+})
+
 
 //Test endpoint
 app.get('/test', async (req: any, res: any) => {
