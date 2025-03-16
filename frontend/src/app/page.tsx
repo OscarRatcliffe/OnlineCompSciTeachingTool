@@ -1,6 +1,7 @@
 'use client'
 import React from 'react';
 import { useState, useEffect } from "react";
+import base64 from "base-64";
 import axios from "axios";
 import styles from "./page.module.scss";
 import cookie from 'cookie';
@@ -325,11 +326,13 @@ export default function Home() {
         const formData = new FormData(event.currentTarget); 
     
         const code = formData.get('code') as FormDataEntryValue;
+
+        console.log(code.toString())
     
           // Get request to backend
           await axios.get("http://localhost:3000/runCode", {
             headers: {
-              'code': code.toString(),
+              'code': base64.encode(code.toString()), //Base 64 encoding used to allow for multi-line
               'sessionid': sessionID,
             }
     

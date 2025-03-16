@@ -2,6 +2,7 @@
 import fs from 'fs';
 import express from 'express';
 import Docker from 'dockerode';
+import base64 from 'base-64';
 const app = express();
 //CORS
 import cors from 'cors';
@@ -158,6 +159,8 @@ app.get('/runCode', async (req, res) => {
         "code": req.headers.code,
         "sessionID": req.headers.sessionid
     };
+    let code = base64.decode(reqData.code);
+    console.log(code);
     let checkAuth = await authCheck(reqData.sessionID);
     if (checkAuth != null) {
         try {
@@ -178,7 +181,7 @@ app.get('/runCode', async (req, res) => {
                 AttachStderr: true,
                 AttachStdin: true,
                 name: containerID.toString(),
-                Cmd: ['python', '-c', reqData.code]
+                Cmd: ['python', '-c', code]
             }, async function (err, container) {
                 // Run container
                 await container.start();

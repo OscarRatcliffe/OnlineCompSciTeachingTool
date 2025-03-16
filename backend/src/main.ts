@@ -2,6 +2,8 @@
 import fs from 'fs';
 import express from 'express'
 import Docker from 'dockerode';
+import base64 from 'base-64';
+
 import { spawn } from 'child_process';
 
 const app = express()
@@ -245,6 +247,10 @@ app.get('/runCode', async (req:any, res:any) => {
         "sessionID": req.headers.sessionid
     }
 
+    let code = base64.decode(reqData.code)
+
+    console.log(code)
+
     let checkAuth: authCheckFormat | null = await authCheck(reqData.sessionID) 
 
     if (checkAuth != null) {
@@ -274,7 +280,7 @@ app.get('/runCode', async (req:any, res:any) => {
                 AttachStderr: true,
                 AttachStdin: true,
                 name: containerID.toString(),
-                Cmd: ['python', '-c', reqData.code]
+                Cmd: ['python', '-c', code]
 
             }, async function(err: any, container: any) {
 
