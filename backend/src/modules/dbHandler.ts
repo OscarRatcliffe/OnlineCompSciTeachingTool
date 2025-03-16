@@ -131,12 +131,44 @@ async function authCheck(sessionID:string): Promise<authCheckFormat | null> { //
     
     let userType: userGroup = "Student"
 
+    try { //Used so that if a class cannot be found the program does not crash
+        
+        const studentClassesRes = await client.query(`SELECT class.id, class.name FROM class FULL OUTER JOIN student ON class.id = student.class WHERE student.id ='${sessionRes.rows[0].id}'`)
+    
+         classes.push({
+            "ID": studentClassesRes.rows[0].id,
+            "Name": studentClassesRes.rows[0].name
+        })
+
+    } catch(err) {
+
+        console.log(err)
+
+    }
+
     if (sessionRes.rowCount == 0) { //If cant find student check teachers
 
         sessionRes = await client.query(`SELECT id, session_expires FROM teacher WHERE last_session_id='${sessionID}'`) //Get password field for teacher
         userType = "Teacher"
 
         console.log(sessionRes)
+
+        const teacherClassesRes = await client.query(`SELECT id, name FROM class WHERE teacher='${sessionRes.rows[0].id}'`)
+
+        classes = []
+
+        console.log(classes)
+
+        for (let i = 0; i < teacherClassesRes.rows.length; i++) {  //Iterate through returned rows
+
+            classes.push({
+                "ID": teacherClassesRes.rows[i].id,
+                "Name": teacherClassesRes.rows[i].name
+            })
+
+        }
+
+        console.log(classes)
 
     }
 
@@ -164,37 +196,9 @@ async function authCheck(sessionID:string): Promise<authCheckFormat | null> { //
             validAuth = false
             console.log("Session ID expired")
         }
-
-        
-
-        if(userType = "Teacher") { // Teacher classes
-
-            const classesres = await client.query(`SELECT id, name FROM class WHERE teacher='${sessionRes.rows[0].id}'`)
-
-            for (let i = 0; i < classesres.rows.length; i++) {  //Iterate through returned rows
-
-                classes.push({
-                    "ID": classesres.rows[i].id,
-                    "Name": classesres.rows[i].name
-                })
-
-            }
-
-        } else { // Student classes
-
-            const classesres = await client.query(`SELECT class.id, class.name FROM class FULL OUTER JOIN student ON class.id = student.class WHERE student.id ='${sessionRes.rows[0].id}'`)
-
-            classes.push({
-                "ID": classesres.rows[0].id,
-                "Name": classesres.rows[0].name
-            })
-
-        }
-
-        
-
+    
     }
-
+    
     if (validAuth) {
 
         return {

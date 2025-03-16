@@ -83,10 +83,30 @@ async function authCheck(sessionID) {
     let validAuth = true;
     let sessionRes = await client.query(`SELECT class, session_expires, id FROM student WHERE last_session_id='${sessionID}'`); //Get password field for student
     let userType = "Student";
+    try {
+        const studentClassesRes = await client.query(`SELECT class.id, class.name FROM class FULL OUTER JOIN student ON class.id = student.class WHERE student.id ='${sessionRes.rows[0].id}'`);
+        classes.push({
+            "ID": studentClassesRes.rows[0].id,
+            "Name": studentClassesRes.rows[0].name
+        });
+    }
+    catch (err) {
+        console.log(err);
+    }
     if (sessionRes.rowCount == 0) { //If cant find student check teachers
         sessionRes = await client.query(`SELECT id, session_expires FROM teacher WHERE last_session_id='${sessionID}'`); //Get password field for teacher
         userType = "Teacher";
         console.log(sessionRes);
+        const teacherClassesRes = await client.query(`SELECT id, name FROM class WHERE teacher='${sessionRes.rows[0].id}'`);
+        classes = [];
+        console.log(classes);
+        for (let i = 0; i < teacherClassesRes.rows.length; i++) { //Iterate through returned rows
+            classes.push({
+                "ID": teacherClassesRes.rows[i].id,
+                "Name": teacherClassesRes.rows[i].name
+            });
+        }
+        console.log(classes);
     }
     // Custom error handling
     if (typeof (sessionRes.rowCount) == null) {
@@ -106,13 +126,6 @@ async function authCheck(sessionID) {
         if (sessionRes.rows[0].session_expires < days) {
             validAuth = false;
             console.log("Session ID expired");
-        }
-        const classesres = await client.query(`SELECT id, name FROM class WHERE teacher='${sessionRes.rows[0].id}'`);
-        for (let i = 0; i < classesres.rows.length; i++) { //Iterate through returned rows
-            classes.push({
-                "ID": classesres.rows[i].id,
-                "Name": classesres.rows[i].name
-            });
         }
     }
     if (validAuth) {
