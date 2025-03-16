@@ -128,7 +128,7 @@ app.get('/getTaskList', async (req, res) => {
         "sessionID": req.headers.sessionid
     };
     let checkAuth = await authCheck(reqData.sessionID);
-    console.log("Auth result: " + checkAuth);
+    console.log("Auth result: " + await checkAuth);
     let validAuth = false;
     if (checkAuth != null) {
         // Check if user is in class

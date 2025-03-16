@@ -29,18 +29,20 @@
     - Switch between classes
     - Get task list
         - View tasks
-
         - Create tasks
+        
     - Create students
     - Create classes
         - Modified check auth func again
     - Log out
-    
 - Main page student
-    - Update backend auth check function
     - Adapted view
 
+- Code editor
 - Create container initial attempt - Talk about challenges
+
+- Running code in containers
+- Linking the 2
 
 # Prototype stages
 - Teacher login, create class, create students, create task

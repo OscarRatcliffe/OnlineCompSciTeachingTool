@@ -190,6 +190,16 @@
         text-align: left;
       }
 
+      button {
+          background: none;
+          border: none;
+
+          font-family: "Roboto Mono", monospace;
+          font-optical-sizing: auto;
+          font-style: normal;
+          color: white;
+      }
+
     }
 
       
@@ -326,6 +336,99 @@
         margin: auto;
 
       }
+
+      .button {
+        color: #97979a;
+        border: 0;
+      }
+
+      .button:hover {
+        color: #c3c3c5;
+      }
+    
+      .button:active {
+        color: white;
+      }
+
+      input {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+
+        width: 100%;
+        height: 3em;
+        margin: 0.4em;
+        margin-top: 2em;
+    
+        background: 0;
+    
+        border-top: 0em;
+        border-left: 0em;
+        border-right: 0em;
+    
+        border-color: #2c313c;
+    
+        outline: 0;
+    
+        font-family: "gothambold";
+        color: white;
+    
+        text-align: center;
+      }
+
+    }
+
+  }
+
+  .codeEditor {
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+
+    .form {
+
+      display: block;
+      padding: 5em;
+
+      width: 70em;
+      height: 40em;
+
+      background-color: #1F1E25;
+      border-radius: 1em;
+
+      filter: drop-shadow(6px 5px 16px #00000062);
+
+      form {
+
+        max-width: 70em;
+        margin: auto;
+
+      }
+
+      textarea {
+        border: none;
+        background: none;
+        resize: none;
+        width: 60em;
+        height: 20em;
+        margin: auto;
+        
+        font-family: "Roboto Mono", monospace;
+        font-optical-sizing: auto;
+        font-style: normal;
+        color: white;
+      }
+
+      textarea:focus {outline:none!important;}
+
 
       .button {
         color: #97979a;

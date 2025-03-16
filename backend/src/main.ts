@@ -195,7 +195,7 @@ app.get('/getTaskList', async (req:any, res:any) => {
 
     let checkAuth: authCheckFormat | null = await authCheck(reqData.sessionID) 
 
-    console.log("Auth result: " + checkAuth)
+    console.log("Auth result: " + await checkAuth)
 
     let validAuth = false
 

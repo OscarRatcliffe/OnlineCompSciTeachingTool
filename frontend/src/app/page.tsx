@@ -28,6 +28,9 @@ export default function Home() {
 
   const [createNewClassVisable, setCreateNewClassVisable] = useState(false);
 
+  const [codeEditorVisible, setCodeEditorVisible] = useState(false);
+  const [terminalResponse, setTerminalResponse] = useState("Run your code to get an output!");
+
   const [isTeacher, setIsTeacher] = useState(true); 
 
   const [currentClass, setCurrentClass] = useState(-1);
@@ -211,6 +214,10 @@ export default function Home() {
       setCreateNewClassVisable(true)
     }
 
+    function codeEditorHandler() {
+      setCodeEditorVisible(true)
+    }
+
   async function newStudentCreationHandler(event: any) {
 
     event.preventDefault(); //Stops deafult form behavior
@@ -312,10 +319,58 @@ export default function Home() {
         setCreateNewUserVisable(false)
       }
 
+      async function codeRunHandler(event: any) {
+
+        event.preventDefault(); //Stops deafult form behavior
+        const formData = new FormData(event.currentTarget); 
+    
+        const code = formData.get('code') as FormDataEntryValue;
+    
+          // Get request to backend
+          await axios.get("http://localhost:3000/runCode", {
+            headers: {
+              'code': code.toString(),
+              'sessionid': sessionID,
+            }
+    
+          }).then(function(response) {
+
+            console.log(response.data)
+
+            setTerminalResponse("Code run")
+    
+        }).catch(function(error) { //Error handling
+    
+            switch(error.response.status) { //Switch instead of if to make adding codes easier down the line
+    
+                case 403:
+                  setErrorText("Permissions error")
+                  break;
+    
+              case 500:
+    
+                setErrorText("Internal server error")
+                break;
+                
+    
+              default:
+    
+                setErrorText(`Unexpected error - ${error.response.status}`)
+    
+            }
+    
+            setErrorVisible(true) //Show error message
+    
+          })
+    
+          setCreateNewUserVisable(false)
+        }
+
       async function closePopups() {
 
         setCreateNewClassVisable(false)
         setCreateNewUserVisable(false)
+        setCodeEditorVisible(false)
         
       }
 
@@ -325,6 +380,18 @@ export default function Home() {
         window.location.href = "/login"
 
       }
+
+      // async function codeWritingHandler (event: any) {
+
+      //   event.preventDefault(); //Stops deafult form behavior
+      //   const formData = new FormData(event.currentTarget); 
+    
+      //   const className = formData.get('name') as FormDataEntryValue;
+    
+
+    
+      // }
+  
     
 
   useEffect(() => { //On page load
@@ -511,5 +578,93 @@ export default function Home() {
       
     </div>
   );
+} else { //Student page
+
+  return (
+    <div className={styles.main}>
+
+    <div className={styles.titleBar}>
+
+      <h1 className={styles.Title}>KNICK KNACK</h1>
+
+    </div>
+
+    <div className={styles.classBar}>
+
+        <h1 className={styles.Title}>MENU</h1>
+
+        <div
+
+              className={styles.Item}
+              id={styles.Selected}>
+
+                <p className={styles.Text}>Home</p>
+
+              </div>
+      </div>
+
+    <div className={styles.mainPage} key={currentClass}>
+
+      <div className={styles.student}>
+
+          {errorVisible && (
+          
+                  <ErrorMsg
+                    key={errorVisible.toString()} //Force reloads element
+                    id="error"
+                    error={errorText}
+                  ></ErrorMsg>
+          
+                )}
+
+          {
+              taskList.map((taskItem: any) => (
+
+                <div className={styles.task} key={taskItem.ID}>
+
+                  <h3>{taskItem.Title}</h3>
+                  <p>{taskItem.Description}</p>
+                  <button onClick={codeEditorHandler}>Code editor</button>
+                </div>
+
+              ))
+            }
+
+            <div className={styles.logOut}> 
+
+              <button onClick={logOut}>LogOut</button>
+
+            </div>
+
+    </div>
+
+    {codeEditorVisible && (
+        
+        <div className={styles.codeEditor}>
+        
+            <div className={styles.form}>
+            
+                    <h2>CODE EDITOR</h2>
+  
+                    <form onSubmit={codeRunHandler}> 
+  
+                      <textarea name="code" placeholder="Code"/>
+                      <div>{terminalResponse}</div>
+                      <input className={styles.button} type="submit" value="Run" />
+                      <input className={styles.button} type="button" onClick={closePopups} value="Close" />
+  
+                    </form>
+  
+            </div>
+  
+        </div>
+  
+      )}
+
+    </div>
+    
+  </div>
+);
+
 }
 }
