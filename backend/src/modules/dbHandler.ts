@@ -165,16 +165,33 @@ async function authCheck(sessionID:string): Promise<authCheckFormat | null> { //
             console.log("Session ID expired")
         }
 
-        const classesres = await client.query(`SELECT id, name FROM class WHERE teacher='${sessionRes.rows[0].id}'`)
+        
 
-        for (let i = 0; i < classesres.rows.length; i++) {  //Iterate through returned rows
+        if(userType = "Teacher") { // Teacher classes
+
+            const classesres = await client.query(`SELECT id, name FROM class WHERE teacher='${sessionRes.rows[0].id}'`)
+
+            for (let i = 0; i < classesres.rows.length; i++) {  //Iterate through returned rows
+
+                classes.push({
+                    "ID": classesres.rows[i].id,
+                    "Name": classesres.rows[i].name
+                })
+
+            }
+
+        } else { // Student classes
+
+            const classesres = await client.query(`SELECT class.id, class.name FROM class FULL OUTER JOIN student ON class.id = student.class WHERE student.id ='${sessionRes.rows[0].id}'`)
 
             classes.push({
-                "ID": classesres.rows[i].id,
-                "Name": classesres.rows[i].name
+                "ID": classesres.rows[0].id,
+                "Name": classesres.rows[0].name
             })
 
         }
+
+        
 
     }
 

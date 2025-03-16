@@ -37,6 +37,7 @@
     - Log out
 - Main page student
     - Adapted view
+    - Updated authcheck func to handler teacher classes and student classes differently (OUTER JOIN SQL)
 
 - Code editor
 - Create container initial attempt - Talk about challenges
