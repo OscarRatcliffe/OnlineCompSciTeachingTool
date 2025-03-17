@@ -195,7 +195,6 @@ app.get('/runCode', async (req, res) => {
                 // Delete container once code has run
                 await container.remove();
                 currentContainerIDs = currentContainerIDs.filter((item) => item !== containerID); //Remove ID from current running containers
-                res.status(201); //Created
                 res.send({
                     "State": `Created container ${containerID}`,
                     "terminalRes": `${logs.toString()}`
@@ -219,18 +218,20 @@ app.get('/getCode', async (req, res) => {
     };
     let checkAuth = await authCheck(reqData.sessionID);
     console.log("Auth result: " + await checkAuth);
-    let validAuth = false;
-    if (checkAuth != null) {
-        let code = getCode(reqData.taskID, checkAuth.userID);
-        if (code == null) {
-            res.sendStatus(404); //No previous solution found
-        }
-        else {
+    if (checkAuth) {
+        let code = await getCode(reqData.taskID, checkAuth.userID);
+        if (code != null) {
+            console.log(code);
+            console.log("Code - Found");
             res.status(200);
             res.send(code);
         }
+        else {
+            console.log("Code - Not found");
+            res.sendStatus(404); //No previous solution found
+        }
     }
-    if (!validAuth) {
+    else {
         res.sendStatus(403);
     }
 });

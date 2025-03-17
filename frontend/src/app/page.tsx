@@ -223,17 +223,18 @@ export default function Home() {
       console.log(taskID)
 
       setCurrentTask(taskID)
-      setCodeEditorVisible(true)
 
       await axios.get("http://localhost:3000/getCode", {
         headers: {
-          "taskid": currentTask,
+          "taskid": taskID,
           'sessionid': sessionID,
         }
 
       }).then(function(response) {
 
-        setCodeEditorContent(base64.decode(response.data.code))
+        console.log(response)
+
+        setCodeEditorContent(base64.decode(response.data))
 
     }).catch(function(error) { //Error handling
 
@@ -264,6 +265,7 @@ export default function Home() {
       })
 
       setCreateNewUserVisable(false)
+      setCodeEditorVisible(true)
     }
 
   async function newStudentCreationHandler(event: any) {
@@ -689,7 +691,7 @@ export default function Home() {
   
                     <form onSubmit={codeRunHandler}> 
   
-                      <textarea name="code" placeholder={codeEditorContent}/>
+                      <textarea name="code" defaultValue={codeEditorContent}/>
                       <div>{terminalResponse}</div>
                       <input className={styles.button} type="submit" value="Run" />
                       <input className={styles.button} type="button" onClick={closePopups} value="Close" />
