@@ -35,27 +35,16 @@
     - Create classes
         - Modified check auth func again
     - Log out
-
-## Prototype 1 testing, feedback & improvements 
-
+- Prototype 1 testing, feedback & improvements 
 - Main page student
     - Adapted view
     - Updated authcheck func to handler teacher classes and student classes differently (OUTER JOIN SQL)
-
-## Prototype 2 testing, feedback & improvements 
-
+- Prototype 2 testing, feedback & improvements 
 - Code editor
-- Create container initial attempt - Talk about challenges
-- Running code in containers
-- Linking the 2
-- Multi line support
-- Saving code - DB Change
-
-## Prototype 3 testing, feedback & improvements 
-
-## Final code testing & improvements 
-
-# Prototype stages
-- Teacher login, create class, create students, create task
-- Student work on / run task
-- Task submission / review
+    - Create container initial attempt - Talk about challenges
+    - Running code in containers
+    - Linking the 2
+    - Multi line support
+    - Saving code - DB Change
+- Prototype 3 testing, feedback & improvements 
+- Final code testing & improvements 
