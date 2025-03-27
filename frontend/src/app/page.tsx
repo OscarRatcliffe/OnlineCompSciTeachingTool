@@ -308,6 +308,11 @@ export default function Home() {
               setErrorText("Permissions error")
               break;
 
+            case 409:
+              setErrorText("Username already in use");
+              break;
+  
+
           case 500:
 
             setErrorText("Internal server error")
