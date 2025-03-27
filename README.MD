@@ -24,17 +24,16 @@
 - Sign up page / backend
 - Main page teacher
     - Get classes list
-        - Part of auth check func (Not yet written about)
+        - Part of auth check func
     - Dynamically list classes
     - Switch between classes
     - Get task list
         - View tasks
         - Create tasks
-        
     - Create students
-    - Create classes
-        - Modified check auth func again
     - Log out
+    - Create classes
+
 - Prototype 1 testing, feedback & improvements 
 - Main page student
     - Adapted view
