@@ -253,7 +253,9 @@ async function createNewTask(title: string, description: string, classID: number
 async function teacherSignup(username:string, password:string): Promise<number> { //HTTPCode
 
     //Check if already exists
-    let sessionRes = await client.query(`SELECT username FROM teacher WHERE username='${username}'`)
+    let sessionRes = await client.query(`SELECT username FROM teacher WHERE username='${username}'
+                                        UNION
+                                        SELECT username FROM student WHERE username = '${username}'`)
 
     if(typeof(sessionRes.rowCount) == null) { //Check for SQL error
 
@@ -287,7 +289,9 @@ async function teacherSignup(username:string, password:string): Promise<number> 
 async function studentSignup(username:string, password:string, classID:number): Promise<number> {
 
     //Check if already exists
-    let sessionRes = await client.query(`SELECT username FROM student WHERE username='${username}'`)
+    let sessionRes = await client.query(`SELECT username FROM teacher WHERE username='${username}'
+        UNION
+        SELECT username FROM student WHERE username = '${username}'`)
 
     if(typeof(sessionRes.rowCount) == null) { //Check for SQL error
 
