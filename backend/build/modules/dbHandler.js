@@ -163,7 +163,9 @@ async function createNewTask(title, description, classID) {
 //Teacher Signup
 async function teacherSignup(username, password) {
     //Check if already exists
-    let sessionRes = await client.query(`SELECT username FROM teacher WHERE username='${username}'`);
+    let sessionRes = await client.query(`SELECT username FROM teacher WHERE username='${username}'
+                                        UNION
+                                        SELECT username FROM student WHERE username = '${username}'`);
     if (typeof (sessionRes.rowCount) == null) { //Check for SQL error
         return StatusCodes.INTERNAL_SERVER_ERROR;
     }
@@ -187,7 +189,9 @@ async function teacherSignup(username, password) {
 //Student sign up
 async function studentSignup(username, password, classID) {
     //Check if already exists
-    let sessionRes = await client.query(`SELECT username FROM student WHERE username='${username}'`);
+    let sessionRes = await client.query(`SELECT username FROM teacher WHERE username='${username}'
+        UNION
+        SELECT username FROM student WHERE username = '${username}'`);
     if (typeof (sessionRes.rowCount) == null) { //Check for SQL error
         return StatusCodes.INTERNAL_SERVER_ERROR;
     }

@@ -87,7 +87,7 @@ app.get('/createClass', async (req:any, res:any) => {
     if(checkAuth != null) {
 
         createClass(reqData.className, checkAuth.userID)
-        res.status(201) //Created
+        res.sendStatus(201) //Created
 
     } else {
 
@@ -204,6 +204,7 @@ app.get('/createNewTask', async (req:any, res:any) => {
     if (checkAuth != null) {
 
         createNewTask(reqData.title, reqData.description, reqData.classID)
+        res.sendStatus(201) //Created
 
     } else {
 

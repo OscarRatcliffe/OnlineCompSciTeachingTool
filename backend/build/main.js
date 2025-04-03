@@ -56,7 +56,7 @@ app.get('/createClass', async (req, res) => {
     console.log(checkAuth);
     if (checkAuth != null) {
         createClass(reqData.className, checkAuth.userID);
-        res.status(201); //Created
+        res.sendStatus(201); //Created
     }
     else {
         res.sendStatus(403);
@@ -129,6 +129,7 @@ app.get('/createNewTask', async (req, res) => {
     let checkAuth = await authCheck(reqData.sessionID);
     if (checkAuth != null) {
         createNewTask(reqData.title, reqData.description, reqData.classID);
+        res.sendStatus(201); //Created
     }
     else {
         res.sendStatus(403);

@@ -176,13 +176,17 @@ export default function Home() {
     console.log(title, description, currentClass, sessionID)
 
       // Get request to backend
-      await axios.get("http://localhost:3000/createNewTask", {
+      axios.get("http://localhost:3000/createNewTask", {
         headers: {
           'title': title.toString(),
           'description': description.toString(),
           'classID': currentClass,
           'sessionID': sessionID
         }
+
+      }).then((response) => {
+
+        window.location.reload();
 
       }).catch(function(error) { //Error handling
 
@@ -328,7 +332,7 @@ export default function Home() {
         setErrorVisible(true) //Show error message
 
       })
-
+      
       setCreateNewUserVisable(false)
     }
     }
@@ -339,40 +343,41 @@ export default function Home() {
       const formData = new FormData(event.currentTarget); 
   
       const className = formData.get('name') as FormDataEntryValue;
-  
-        // Get request to backend
-        await axios.get("http://localhost:3000/createClass", {
+
+        axios.get("http://localhost:3000/createClass", {
           headers: {
             'classname': className.toString(),
             'sessionid': sessionID,
           }
-  
-        }).catch(function(error) { //Error handling
-  
+        }).then((response) => {
+
+          window.location.reload();
+
+        }).catch(function(error) {
+
           switch(error.response.status) { //Switch instead of if to make adding codes easier down the line
-  
+    
               case 403:
                 setErrorText("Permissions error")
                 break;
-  
+
             case 500:
-  
+
               setErrorText("Internal server error")
               break;
               
-  
+
             default:
-  
+
               setErrorText(`Unexpected error - ${error.response.status}`)
-  
+
           }
-  
+
           setErrorVisible(true) //Show error message
-  
-        })
-  
-        setCreateNewUserVisable(false)
-      }
+
+        });
+
+    }
 
       async function codeRunHandler(event: any) {
 
