@@ -18,10 +18,10 @@ await client.connect();
 async function login(username, password) {
     let HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR;
     let sessionID = "";
-    let passwordRes = await client.query(`SELECT password, class FROM student WHERE username='${username}'`); //Get password field for student
+    let passwordRes = await client.query("SELECT password, class FROM student WHERE username = $1", [username]); //Get password field for student
     let userType = "Student";
     if (passwordRes.rowCount == 0) { //If cant find student check teachers
-        passwordRes = await client.query(`SELECT password, ID FROM teacher WHERE username='${username}'`); //Get password field for teacher
+        passwordRes = await client.query(`SELECT password, ID FROM teacher WHERE username=$1"`, [username]); //Get password field for teacher
         userType = "Teacher";
     }
     // Custom error handling
@@ -68,7 +68,7 @@ async function login(username, password) {
                 const epochTime = new Date().getTime();
                 const days = Math.floor(epochTime / 86400000); //Convert from ms since 1970 to days
                 const nextWeekDays = days + 7;
-                await client.query(`UPDATE ${userType.toLowerCase()} SET last_session_id = '${sessionID}', session_expires = '${nextWeekDays}' WHERE username='${username}'`); //Only 1 session ID does limit device amount but not an issue due to only being used on school computers
+                await client.query(`UPDATE ${userType.toLowerCase()} SET last_session_id = $1, session_expires = $2 WHERE username = $3`, [sessionID, nextWeekDays, username]);
             }
             else {
                 HTTPCode = StatusCodes.UNAUTHORIZED; //Password incorrect
@@ -81,10 +81,10 @@ async function login(username, password) {
 async function authCheck(sessionID) {
     let classes = [];
     let validAuth = true;
-    let sessionRes = await client.query(`SELECT class, session_expires, id FROM student WHERE last_session_id='${sessionID}'`); //Get password field for student
+    let sessionRes = await client.query(`SELECT class, session_expires, id FROM student WHERE last_session_id=$1`, [sessionID]); //Get password field for student
     let userType = "Student";
     try { //Used so that if a class cannot be found the program does not crash
-        const studentClassesRes = await client.query(`SELECT class.id, class.name FROM class FULL OUTER JOIN student ON class.id = student.class WHERE student.id ='${sessionRes.rows[0].id}'`);
+        const studentClassesRes = await client.query(`SELECT class.id, class.name FROM class FULL OUTER JOIN student ON class.id = student.class WHERE student.id =$1`, [sessionRes.rows[0].id]);
         classes.push({
             "ID": studentClassesRes.rows[0].id,
             "Name": studentClassesRes.rows[0].name
@@ -94,10 +94,10 @@ async function authCheck(sessionID) {
         console.log(err);
     }
     if (sessionRes.rowCount == 0) { //If cant find student check teachers
-        sessionRes = await client.query(`SELECT id, session_expires FROM teacher WHERE last_session_id='${sessionID}'`); //Get password field for teacher
+        sessionRes = await client.query(`SELECT id, session_expires FROM teacher WHERE last_session_id=$1`, [sessionID]); //Get password field for teacher
         userType = "Teacher";
         console.log(sessionRes);
-        const teacherClassesRes = await client.query(`SELECT id, name FROM class WHERE teacher='${sessionRes.rows[0].id}'`);
+        const teacherClassesRes = await client.query(`SELECT id, name FROM class WHERE teacher=$1`, [sessionRes.rows[0].id]);
         classes = [];
         console.log(classes);
         for (let i = 0; i < teacherClassesRes.rows.length; i++) { //Iterate through returned rows
@@ -139,7 +139,7 @@ async function authCheck(sessionID) {
 }
 //Get task list
 async function getTaskList(classID) {
-    let taskList = await client.query(`SELECT id, title, deadline, description FROM task WHERE class='${classID}'`);
+    let taskList = await client.query(`SELECT id, title, deadline, description FROM task WHERE class=$1`, [classID]);
     // Return null if no tasks found
     if (taskList.rowCount == 0) {
         return null;
@@ -158,14 +158,14 @@ async function getTaskList(classID) {
     }
 }
 async function createNewTask(title, description, classID) {
-    await client.query(`INSERT INTO task (title, description, class) VALUES ('${title}', '${description}', '${classID}')`);
+    await client.query(`INSERT INTO task (title, description, class) VALUES ('$'1, '$2', '$3')`, [title, description, classID]);
 }
 //Teacher Signup
 async function teacherSignup(username, password) {
     //Check if already exists
-    let sessionRes = await client.query(`SELECT username FROM teacher WHERE username='${username}'
+    let sessionRes = await client.query(`SELECT username FROM teacher WHERE username='$1'
                                         UNION
-                                        SELECT username FROM student WHERE username = '${username}'`);
+                                        SELECT username FROM student WHERE username = '$2'`, [username, username]);
     if (typeof (sessionRes.rowCount) == null) { //Check for SQL error
         return StatusCodes.INTERNAL_SERVER_ERROR;
     }
@@ -179,7 +179,7 @@ async function teacherSignup(username, password) {
             await bcrypt.genSalt(saltRounds, async function (err, salt) {
                 await bcrypt.hash(password, salt, async function (err, hash) {
                     //Add entry to DB
-                    await client.query(`INSERT INTO teacher (username,password) VALUES ('${username}','${hash}')`);
+                    await client.query(`INSERT INTO teacher (username,password) VALUES ('$1','$2')`, [username, hash]);
                 });
             });
             return StatusCodes.CREATED;
@@ -189,9 +189,9 @@ async function teacherSignup(username, password) {
 //Student sign up
 async function studentSignup(username, password, classID) {
     //Check if already exists
-    let sessionRes = await client.query(`SELECT username FROM teacher WHERE username='${username}'
+    let sessionRes = await client.query(`SELECT username FROM teacher WHERE username='$1'
         UNION
-        SELECT username FROM student WHERE username = '${username}'`);
+        SELECT username FROM student WHERE username = '$2'`, [username, username]);
     if (typeof (sessionRes.rowCount) == null) { //Check for SQL error
         return StatusCodes.INTERNAL_SERVER_ERROR;
     }
@@ -205,7 +205,7 @@ async function studentSignup(username, password, classID) {
             await bcrypt.genSalt(saltRounds, async function (err, salt) {
                 await bcrypt.hash(password, salt, async function (err, hash) {
                     //Add entry to DB
-                    await client.query(`INSERT INTO student (username,password, class) VALUES ('${username}','${hash}','${classID}')`);
+                    await client.query(`INSERT INTO student (username,password, class) VALUES ('$1','$2','$3')`, [username, hash, classID]);
                 });
             });
             return StatusCodes.CREATED;
@@ -214,22 +214,22 @@ async function studentSignup(username, password, classID) {
 }
 //Create class
 async function createClass(className, teacherID) {
-    await client.query(`INSERT INTO class (name,teacher) VALUES ('${className}','${teacherID}')`);
+    await client.query(`INSERT INTO class (name,teacher) VALUES ('$1','$2`, [className, teacherID]);
     return StatusCodes.CREATED;
 }
 async function newCodeSave(taskID, studentID, code) {
     //Check if already exists
-    let sessionRes = await client.query(`SELECT id FROM solutions WHERE task='${taskID}' AND student='${studentID}'`);
+    let sessionRes = await client.query(`SELECT id FROM solutions WHERE task='$1' AND student='$2'`, [taskID, studentID]);
     if (sessionRes.rowCount > 0) { //Found in DB
-        await client.query(`UPDATE solutions SET task='${taskID}', student='${studentID}', code='${code}' WHERE ID=${sessionRes.rows[0].id}`);
+        await client.query(`UPDATE solutions SET task='$1', student='$2', code='$3' WHERE ID=$4`, [taskID, studentID, code, sessionRes.rows[0].id]);
     }
     else {
-        await client.query(`INSERT INTO solutions (task, student, code) VALUES ('${taskID}', '${studentID}', '${code}')`);
+        await client.query(`INSERT INTO solutions (task, student, code) VALUES ('$1', '$2', '$3')`, [taskID, studentID, code]);
     }
 }
 async function getCode(taskID, studentID) {
     try {
-        let sessionRes = await client.query(`SELECT code FROM solutions WHERE task='${taskID}' AND student='${studentID}'`);
+        let sessionRes = await client.query(`SELECT code FROM solutions WHERE task='$1' AND student='$2'`, [taskID, studentID]);
         return sessionRes.rows[0].code;
     }
     catch {
