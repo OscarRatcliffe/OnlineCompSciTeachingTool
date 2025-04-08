@@ -23,13 +23,12 @@ async function login(username:string, password:string): Promise<[number, string]
     let HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR;
     let sessionID = "";
 
-    let passwordRes = await client.query("SELECT password, class FROM student WHERE username = $1", [username]) //Get password field for student
-
+    let passwordRes = await client.query(`SELECT password, class FROM student WHERE username='${username}'`) //Get password field for student
     let userType: userGroup = "Student"
 
     if (passwordRes.rowCount == 0) { //If cant find student check teachers
 
-        passwordRes = await client.query(`SELECT password, ID FROM teacher WHERE username=$1"`, [username]) //Get password field for teacher
+        passwordRes = await client.query(`SELECT password, ID FROM teacher WHERE username='${username}'`) //Get password field for teacher
         userType = "Teacher"
 
     }
@@ -106,7 +105,7 @@ async function login(username:string, password:string): Promise<[number, string]
 
                 const nextWeekDays = days + 7; 
 
-                await client.query(`UPDATE ${userType.toLowerCase()} SET last_session_id = $1, session_expires = $2 WHERE username = $3`, [sessionID, nextWeekDays, username]) 
+                await client.query(`UPDATE ${userType.toLowerCase()} SET last_session_id = '${sessionID}', session_expires = '${nextWeekDays}' WHERE username='${username}'`) //Only 1 session ID does limit device amount but not an issue due to only being used on school computers
 
             } else {
 
@@ -128,13 +127,13 @@ async function authCheck(sessionID:string): Promise<authCheckFormat | null> { //
     let classes: Array<classFormat> = []
     let validAuth:boolean = true;
 
-    let sessionRes = await client.query(`SELECT class, session_expires, id FROM student WHERE last_session_id=$1`, [sessionID]) //Get password field for student
+    let sessionRes = await client.query(`SELECT class, session_expires, id FROM student WHERE last_session_id='${sessionID}'`) //Get password field for student
     
     let userType: userGroup = "Student"
 
     try { //Used so that if a class cannot be found the program does not crash
         
-        const studentClassesRes = await client.query(`SELECT class.id, class.name FROM class FULL OUTER JOIN student ON class.id = student.class WHERE student.id =$1`, [sessionRes.rows[0].id])
+        const studentClassesRes = await client.query(`SELECT class.id, class.name FROM class FULL OUTER JOIN student ON class.id = student.class WHERE student.id ='${sessionRes.rows[0].id}'`)
     
          classes.push({
             "ID": studentClassesRes.rows[0].id,
@@ -149,12 +148,12 @@ async function authCheck(sessionID:string): Promise<authCheckFormat | null> { //
 
     if (sessionRes.rowCount == 0) { //If cant find student check teachers
 
-        sessionRes = await client.query(`SELECT id, session_expires FROM teacher WHERE last_session_id=$1`, [sessionID]) //Get password field for teacher
+        sessionRes = await client.query(`SELECT id, session_expires FROM teacher WHERE last_session_id='${sessionID}'`) //Get password field for teacher
         userType = "Teacher"
 
         console.log(sessionRes)
 
-        const teacherClassesRes = await client.query(`SELECT id, name FROM class WHERE teacher=$1`, [sessionRes.rows[0].id])
+        const teacherClassesRes = await client.query(`SELECT id, name FROM class WHERE teacher='${sessionRes.rows[0].id}'`)
 
         classes = []
 
@@ -216,7 +215,7 @@ async function authCheck(sessionID:string): Promise<authCheckFormat | null> { //
 //Get task list
 async function getTaskList(classID:number): Promise<Array<taskListFormat> | null> {
 
-    let taskList = await client.query(`SELECT id, title, deadline, description FROM task WHERE class=$1`, [classID])
+    let taskList = await client.query(`SELECT id, title, deadline, description FROM task WHERE class='${classID}'`)
 
     // Return null if no tasks found
     if(taskList.rowCount as number == 0) {  
@@ -246,7 +245,7 @@ async function getTaskList(classID:number): Promise<Array<taskListFormat> | null
 
 async function createNewTask(title: string, description: string, classID: number) {
 
-    await client.query(`INSERT INTO task (title, description, class) VALUES ('$'1, '$2', '$3')`, [title,description, classID])
+    await client.query(`INSERT INTO task (title, description, class) VALUES ('${title}', '${description}', '${classID}')`)
 
 }
 
@@ -254,9 +253,9 @@ async function createNewTask(title: string, description: string, classID: number
 async function teacherSignup(username:string, password:string): Promise<number> { //HTTPCode
 
     //Check if already exists
-    let sessionRes = await client.query(`SELECT username FROM teacher WHERE username='$1'
+    let sessionRes = await client.query(`SELECT username FROM teacher WHERE username='${username}'
                                         UNION
-                                        SELECT username FROM student WHERE username = '$2'`, [username, username])
+                                        SELECT username FROM student WHERE username = '${username}'`)
 
     if(typeof(sessionRes.rowCount) == null) { //Check for SQL error
 
@@ -277,7 +276,7 @@ async function teacherSignup(username:string, password:string): Promise<number> 
                     await bcrypt.hash(password, salt, async function(err, hash) { //Hash password
 
                         //Add entry to DB
-                        await client.query(`INSERT INTO teacher (username,password) VALUES ('$1','$2')`, [username, hash])  
+                        await client.query(`INSERT INTO teacher (username,password) VALUES ('${username}','${hash}')`)  
                     });
                 })
                 
@@ -290,9 +289,9 @@ async function teacherSignup(username:string, password:string): Promise<number> 
 async function studentSignup(username:string, password:string, classID:number): Promise<number> {
 
     //Check if already exists
-    let sessionRes = await client.query(`SELECT username FROM teacher WHERE username='$1'
+    let sessionRes = await client.query(`SELECT username FROM teacher WHERE username='${username}'
         UNION
-        SELECT username FROM student WHERE username = '$2'`, [username, username])
+        SELECT username FROM student WHERE username = '${username}'`)
 
     if(typeof(sessionRes.rowCount) == null) { //Check for SQL error
 
@@ -313,7 +312,7 @@ async function studentSignup(username:string, password:string, classID:number): 
                     await bcrypt.hash(password, salt, async function(err, hash) { //Hash password
 
                         //Add entry to DB
-                        await client.query(`INSERT INTO student (username,password, class) VALUES ('$1','$2','$3')`, [username, hash, classID])  
+                        await client.query(`INSERT INTO student (username,password, class) VALUES ('${username}','${hash}','${classID}')`)  
                     });
                 })
                 
@@ -326,7 +325,7 @@ async function studentSignup(username:string, password:string, classID:number): 
 //Create class
 async function createClass(className:string, teacherID: number): Promise<number> {
 
-    await client.query(`INSERT INTO class (name,teacher) VALUES ('$1','$2`, [className, teacherID])  
+    await client.query(`INSERT INTO class (name,teacher) VALUES ('${className}','${teacherID}')`)  
 
     return StatusCodes.CREATED
 }
@@ -334,15 +333,15 @@ async function createClass(className:string, teacherID: number): Promise<number>
 async function newCodeSave(taskID: number, studentID: number, code: string) {
 
     //Check if already exists
-    let sessionRes = await client.query(`SELECT id FROM solutions WHERE task='$1' AND student='$2'`, [taskID, studentID])
+    let sessionRes = await client.query(`SELECT id FROM solutions WHERE task='${taskID}' AND student='${studentID}'`)
 
     if(sessionRes.rowCount as number > 0) { //Found in DB
 
-        await client.query(`UPDATE solutions SET task='$1', student='$2', code='$3' WHERE ID=$4`, [taskID, studentID, code, sessionRes.rows[0].id])
+        await client.query(`UPDATE solutions SET task='${taskID}', student='${studentID}', code='${code}' WHERE ID=${sessionRes.rows[0].id}`)
 
     } else {
 
-        await client.query(`INSERT INTO solutions (task, student, code) VALUES ('$1', '$2', '$3')`, [taskID, studentID, code])
+        await client.query(`INSERT INTO solutions (task, student, code) VALUES ('${taskID}', '${studentID}', '${code}')`)
     }
 
 }
@@ -352,7 +351,7 @@ async function getCode(taskID: number, studentID: number) {
 
     try {
 
-        let sessionRes = await client.query(`SELECT code FROM solutions WHERE task='$1' AND student='$2'`, [taskID, studentID])
+        let sessionRes = await client.query(`SELECT code FROM solutions WHERE task='${taskID}' AND student='${studentID}'`)
         return sessionRes.rows[0].code
 
     } catch {

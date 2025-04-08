@@ -16,6 +16,7 @@ const client = new Client({
 await client.connect();
 // Check user ID and generate a session ID
 async function login(username, password) {
+    console.log(username);
     let HTTPCode = StatusCodes.INTERNAL_SERVER_ERROR;
     let sessionID = "";
     let passwordRes = await client.query("SELECT password, class FROM student WHERE username = $1", [username]); //Get password field for student

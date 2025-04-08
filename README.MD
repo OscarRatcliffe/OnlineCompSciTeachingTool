@@ -33,8 +33,8 @@
     - Create students
     - Log out
     - Create classes
-
 - Prototype 1 testing, feedback & improvements 
+
 - Main page student
     - Adapted view
     - Updated authcheck func to handler teacher classes and student classes differently (OUTER JOIN SQL)

@@ -1,5 +1,4 @@
 // Librarys
-import fs from 'fs';
 import express from 'express';
 import Docker from 'dockerode';
 import base64 from 'base-64';
@@ -9,8 +8,6 @@ import cors from 'cors';
 app.use(cors());
 // Custom libraries
 import { authCheck, login, teacherSignup, getTaskList, createNewTask, studentSignup, createClass, newCodeSave, getCode } from "./modules/dbHandler.js";
-// Get test script
-const pythonScript = fs.readFileSync('test.py', 'utf8');
 //Login script
 app.get('/login', async (req, res) => {
     // Get post request data
